@@ -51,8 +51,8 @@ todos = [
 "todo2": {todo_id,todo_name,completed,creationTime}
 ]
 tasks = [
-"task1": {task_id,task_name,desc,completed,creationTime},
-"task2": {task_id,task_name,desc,completed,creationTime},
+"task1": {todo_id,task_id,task_name,desc,completed,creationTime},
+"task2": {todo_id,task_id,task_name,desc,completed,creationTime},
 ]
  
 ]
@@ -70,11 +70,15 @@ tasks = [
 
 # functions
 
+- createDb = () => simple returns a database
+- initializeDB (db,tables) => creates given tables in given database
+- createTodo(todo_name , desc)
+- createTask (todo_id,task_name,desc)
 - createTask() => task_name , task_description
 
 # task To do
 
-- [] import all the dependencies (@inquirer/prompts)
+- [Y] import all the dependencies (@inquirer/prompts)
 - [Y] create the directory Structure
-- [] add task to task to dev (coverage , test )
-- [] add files in gitIgnore (Plan.md ,gitIgnore,coverage)
+- [Y] add task to task to dev (coverage , test )
+- [Y] add files in gitIgnore (Plan.md ,gitIgnore,coverage)

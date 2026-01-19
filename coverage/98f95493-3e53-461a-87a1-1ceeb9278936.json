@@ -1,0 +1,37 @@
+{
+  "scriptId": "335",
+  "url": "file:///Users/lavkushkatiyar/workspace/js/js-terminal-todo-Lavkushkatiyar/src/memory.js",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 474, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "<instance_members_initializer>",
+      "ranges": [{ "startOffset": 33, "endOffset": 82, "count": 6 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createDB",
+      "ranges": [{ "startOffset": 44, "endOffset": 82, "count": 4 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "initializeDB",
+      "ranges": [
+        { "startOffset": 86, "endOffset": 289, "count": 4 },
+        { "startOffset": 138, "endOffset": 187, "count": 1 },
+        { "startOffset": 187, "endOffset": 231, "count": 3 },
+        { "startOffset": 231, "endOffset": 270, "count": 6 },
+        { "startOffset": 270, "endOffset": 288, "count": 3 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "addToDo",
+      "ranges": [{ "startOffset": 292, "endOffset": 471, "count": 4 }],
+      "isBlockCoverage": true
+    }
+  ]
+}
