@@ -55,9 +55,27 @@ export class memoryInventory {
     return db.tables.todos[todo].tasks;
   }
   markTaskDone(db, todo_name, task_name) {
+    if (db === undefined) throw new Error("DB is Undefined");
+
     const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
     const todo = db.tables.todos[todoIndex].tasks;
     const taskIndex = this.findTaskIndex(todo, task_name);
     todo[taskIndex].completed = true;
+  }
+
+  deleteTask(db, todo_name, task_name) {
+    if (db === undefined) throw new Error("DB is Undefined");
+
+    const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
+    const todo = db.tables.todos[todoIndex].tasks;
+    const taskIndex = this.findTaskIndex(todo, task_name);
+    todo.splice(taskIndex, 1);
+  }
+  deleteTodo(db, todo_name) {
+    if (db === undefined) throw new Error("DB is Undefined");
+
+    const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
+    const todosList = db.tables.todos;
+    todosList.splice(todoIndex, 1);
   }
 }

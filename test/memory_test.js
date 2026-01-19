@@ -29,6 +29,7 @@ describe("Initialize branch of  memory ", () => {
     assertThrows(() => memory.initializeDB(dbName, tables));
   });
 });
+
 describe("AddTODO: branch of  memory ", () => {
   let memory;
   beforeEach(() => {
@@ -97,6 +98,76 @@ describe("AddTODO: branch of  memory ", () => {
     );
   });
 });
+
+describe("AddTODO: branch of  memory ", () => {
+  let memory;
+  let dbName;
+  beforeEach(() => {
+    memory = new memoryInventory();
+    dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+  });
+  it(" addTODO: should add a todo in the db", () => {
+    assertEquals(addedItemDb, [
+      {
+        completed: "❌",
+        tasks: [],
+        todo_desc: "things To do in morning",
+        todo_id: 1,
+        todo_name: "Morning Routine",
+      },
+    ]);
+  });
+  it(" addTODO: Multiple todo added add a todo in the db", () => {
+    const dbName = memory.createDB();
+    const tables = ["todos", "tasks"];
+    memory.initializeDB(dbName, tables);
+    memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    const addedItems = memory.addToDo(
+      dbName,
+      "Evening Routine",
+      "things To do in evening",
+    );
+
+    assertEquals(addedItems, [
+      {
+        completed: "❌",
+        tasks: [],
+        todo_desc: "things To do in morning",
+        todo_id: 1,
+        todo_name: "Morning Routine",
+      },
+      {
+        completed: "❌",
+        tasks: [],
+        todo_desc: "things To do in evening",
+        todo_id: 2,
+        todo_name: "Evening Routine",
+      },
+    ]);
+  });
+  it(" addTODO: should throw Error if db is undefined ", () => {
+    const dbName = undefined;
+    assertThrows(() =>
+      memory.addToDo(
+        dbName,
+        "Morning Routine",
+        "things To do in morning",
+      )
+    );
+  });
+});
+
 describe("ListTODO: branch of listing the todo in   memory ", () => {
   let memory;
   beforeEach(() => {
@@ -251,7 +322,7 @@ describe("listTasks: branch of listing the task of given todo ", () => {
     assertThrows(() => memory.listTasks(dbName, "Morning Routine"));
   });
 });
-describe("MarkTaskDone: branch of listing the task of given todo ", () => {
+describe("MarkTaskDone: branch of marking Task done of given todo ", () => {
   let memory;
   let dbName;
   beforeEach(() => {
@@ -296,6 +367,59 @@ describe("MarkTaskDone: branch of listing the task of given todo ", () => {
       task_name: "brush",
     }, {
       completed: true,
+      task_desc: "bath with cold water",
+      task_name: "bath",
+    }]);
+  });
+});
+describe("DeleteTask: branch of deleting the task of given todo ", () => {
+  let memory;
+  let dbName;
+  beforeEach(() => {
+    memory = new memoryInventory();
+    dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "brush",
+      "Brush Teeth for 5 mintues",
+    );
+  });
+  it(" MarkTaskDone: should list complete a task in a todo", () => {
+    memory.deleteTask(dbName, "Morning Routine", "brush");
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), []);
+  });
+  it(" MarkTaskDone: should delete both  task of a todo", () => {
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "bath",
+      "bath with cold water",
+    );
+    memory.deleteTask(dbName, "Morning Routine", "brush");
+    memory.deleteTask(dbName, "Morning Routine", "bath");
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), []);
+  });
+  it(" MarkTaskDone: delete one tasks", () => {
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "bath",
+      "bath with cold water",
+    );
+    memory.deleteTask(dbName, "Morning Routine", "brush");
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), [{
+      completed: false,
       task_desc: "bath with cold water",
       task_name: "bath",
     }]);
