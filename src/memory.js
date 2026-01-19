@@ -1,5 +1,10 @@
 export class memoryInventory {
   i = 1;
+
+  findTodo(todo, todo_name) {
+    return todo.findIndex((x) => x.todo_name === todo_name);
+  }
+
   createDB = () => {
     return { tables: {} };
   };
@@ -23,12 +28,22 @@ export class memoryInventory {
     });
     return db.tables.todos;
   }
-
   listTodo(db) {
     if (db === undefined) {
       throw new Error("DB is Undefined");
     }
     const content = db.tables.todos;
     return { success: true, content };
+  }
+
+  addTaskInToDo(db, todo_name, task_name, task_desc) {
+    if (db === undefined) throw new Error("DB is Undefined");
+    const todo = this.findTodo(db.tables.todos, todo_name);
+    db.tables.todos[todo].tasks.push({
+      task_name,
+      task_desc,
+      completed: false,
+    });
+    return { success: true };
   }
 }

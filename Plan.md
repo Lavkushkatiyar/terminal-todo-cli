@@ -41,6 +41,7 @@ Todo List -
 # In memory Structure
 
 ```js
+addTaskInTodo = ToDo_name , task_name,task_desc,
 tables = {}
 
 TODO{[

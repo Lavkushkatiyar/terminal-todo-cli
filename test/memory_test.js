@@ -102,7 +102,7 @@ describe("ListTODO: branch of listing the todo in   memory ", () => {
   beforeEach(() => {
     memory = new memoryInventory();
   });
-  it(" addTODO: should add a todo in the db", () => {
+  it(" listToDo: should add a todo in the db", () => {
     const dbName = memory.createDB();
     memory.initializeDB(dbName);
     memory.addToDo(
@@ -128,5 +128,92 @@ describe("ListTODO: branch of listing the todo in   memory ", () => {
   it(" listToDo: should throw Error if db is undefined ", () => {
     const dbName = undefined;
     assertThrows(() => memory.listTodo(dbName));
+  });
+});
+describe("addTaskInToDo: branch of  memory ", () => {
+  let memory;
+  beforeEach(() => {
+    memory = new memoryInventory();
+  });
+  it(" addTaskInToDo: should add a task in  todo", () => {
+    const dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    const addedItemDb = memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "brush",
+      "Brush Teeth for 5 mintues",
+    );
+
+    assertEquals(addedItemDb, [
+      {
+        completed: "❌",
+        tasks: [{
+          completed: false,
+          task_desc: "Brush Teeth for 5 mintues",
+          task_name: "brush",
+        }],
+        todo_desc: "things To do in morning",
+        todo_id: 1,
+        todo_name: "Morning Routine",
+      },
+    ]);
+  });
+  it(" addTaskInToDo: should add two  task in  one todo", () => {
+    const dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    const addedItemDb = memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "brush",
+      "Brush Teeth for 5 mintues",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "bath",
+      "take A bath with cold water",
+    );
+
+    assertEquals(addedItemDb, [
+      {
+        completed: "❌",
+        tasks: [{
+          completed: false,
+          task_desc: "Brush Teeth for 5 mintues",
+          task_name: "brush",
+        }, {
+          completed: false,
+          task_desc: "take A bath with cold water",
+          task_name: "bath",
+        }],
+        todo_desc: "things To do in morning",
+        todo_id: 1,
+        todo_name: "Morning Routine",
+      },
+    ]);
+  });
+
+  it(" addTODO: should throw Error if db is undefined ", () => {
+    const dbName = undefined;
+    assertThrows(() =>
+      memory.addToDo(
+        dbName,
+        "Morning Routine",
+        "things To do in morning",
+      )
+    );
   });
 });
