@@ -46,4 +46,9 @@ export class memoryInventory {
     });
     return { success: true };
   }
+  listTasks(db, todo_name) {
+    if (db === undefined) throw new Error("DB is Undefined");
+    const todo = this.findTodo(db.tables.todos, todo_name);
+    return db.tables.todos[todo].tasks;
+  }
 }

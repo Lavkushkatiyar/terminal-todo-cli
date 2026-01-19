@@ -209,11 +209,45 @@ describe("addTaskInToDo: branch of  memory ", () => {
   it(" addTODO: should throw Error if db is undefined ", () => {
     const dbName = undefined;
     assertThrows(() =>
-      memory.addToDo(
+      memory.addTaskInToDo(
         dbName,
         "Morning Routine",
         "things To do in morning",
       )
     );
+  });
+});
+
+describe("listTasks: branch of listing the task of given todo ", () => {
+  let memory;
+  beforeEach(() => {
+    memory = new memoryInventory();
+  });
+  it(" listTasks: should list task of a todo", () => {
+    const dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "brush",
+      "Brush Teeth for 5 mintues",
+    );
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), [{
+      completed: false,
+      task_desc: "Brush Teeth for 5 mintues",
+      task_name: "brush",
+    }]);
+  });
+
+  it(" listToDo: should throw Error if db is undefined ", () => {
+    const dbName = undefined;
+    assertThrows(() => memory.listTasks(dbName, "Morning Routine"));
   });
 });
