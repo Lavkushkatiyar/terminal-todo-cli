@@ -251,3 +251,53 @@ describe("listTasks: branch of listing the task of given todo ", () => {
     assertThrows(() => memory.listTasks(dbName, "Morning Routine"));
   });
 });
+describe("MarkTaskDone: branch of listing the task of given todo ", () => {
+  let memory;
+  let dbName;
+  beforeEach(() => {
+    memory = new memoryInventory();
+    dbName = memory.createDB();
+    memory.initializeDB(dbName);
+
+    memory.addToDo(
+      dbName,
+      "Morning Routine",
+      "things To do in morning",
+    );
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "brush",
+      "Brush Teeth for 5 mintues",
+    );
+  });
+  it(" MarkTaskDone: should list complete a task in a todo", () => {
+    memory.markTaskDone(dbName, "Morning Routine", "brush");
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), [{
+      completed: true,
+      task_desc: "Brush Teeth for 5 mintues",
+      task_name: "brush",
+    }]);
+  });
+  it(" MarkTaskDone: should mark complete task of a todo", () => {
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "bath",
+      "bath with cold water",
+    );
+    memory.markTaskDone(dbName, "Morning Routine", "brush");
+    memory.markTaskDone(dbName, "Morning Routine", "bath");
+
+    assertEquals(memory.listTasks(dbName, "Morning Routine"), [{
+      completed: true,
+      task_desc: "Brush Teeth for 5 mintues",
+      task_name: "brush",
+    }, {
+      completed: true,
+      task_desc: "bath with cold water",
+      task_name: "bath",
+    }]);
+  });
+});

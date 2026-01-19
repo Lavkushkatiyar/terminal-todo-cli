@@ -73,8 +73,10 @@ tasks = [
 
 - createDb = () => simple returns a database
 - initializeDB (db,tables) => creates given tables in given database
-- createTodo(todo_name , desc)
-- createTask (todo_id,task_name,desc)
+- createTodo(todo_name , desc) done
+- createTask (todo_id,task_name,desc)done
+- marksTaskDone (task_name)
+- deleteTasks(taskName,); pending
 - createTask() => task_name , task_description
 
 # task To do
