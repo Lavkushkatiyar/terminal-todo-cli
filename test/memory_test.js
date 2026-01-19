@@ -99,7 +99,7 @@ describe("AddTODO: branch of  memory ", () => {
   });
 });
 
-describe("AddTODO: branch of  memory ", () => {
+describe("DeleteTODO: branch of  memory ", () => {
   let memory;
   let dbName;
   beforeEach(() => {
@@ -113,18 +113,12 @@ describe("AddTODO: branch of  memory ", () => {
       "things To do in morning",
     );
   });
-  it(" addTODO: should add a todo in the db", () => {
-    assertEquals(addedItemDb, [
-      {
-        completed: "❌",
-        tasks: [],
-        todo_desc: "things To do in morning",
-        todo_id: 1,
-        todo_name: "Morning Routine",
-      },
-    ]);
+  it(" DELETE TODO: should delete a todo in the db", () => {
+    memory.deleteTodo(dbName, "Morning Routine ");
+
+    assertEquals(memory.listTodo(dbName).content, []);
   });
-  it(" addTODO: Multiple todo added add a todo in the db", () => {
+  it(" DeleteTODO: Deleted one of todo one remains", () => {
     const dbName = memory.createDB();
     const tables = ["todos", "tasks"];
     memory.initializeDB(dbName, tables);
@@ -133,41 +127,33 @@ describe("AddTODO: branch of  memory ", () => {
       "Morning Routine",
       "things To do in morning",
     );
-    const addedItems = memory.addToDo(
+    memory.addToDo(
       dbName,
       "Evening Routine",
       "things To do in evening",
     );
 
-    assertEquals(addedItems, [
-      {
-        completed: "❌",
-        tasks: [],
-        todo_desc: "things To do in morning",
-        todo_id: 1,
-        todo_name: "Morning Routine",
-      },
+    memory.deleteTodo(dbName, "Morning Routine");
+    assertEquals(memory.listTodo(dbName).content, [
       {
         completed: "❌",
         tasks: [],
         todo_desc: "things To do in evening",
-        todo_id: 2,
+        todo_id: 3,
         todo_name: "Evening Routine",
       },
     ]);
   });
-  it(" addTODO: should throw Error if db is undefined ", () => {
-    const dbName = undefined;
+  it(" DeleteTODO: should throw Error if db is undefined ", () => {
     assertThrows(() =>
-      memory.addToDo(
-        dbName,
+      memory.deleteTodo(
+        undefined,
         "Morning Routine",
         "things To do in morning",
       )
     );
   });
 });
-
 describe("ListTODO: branch of listing the todo in   memory ", () => {
   let memory;
   beforeEach(() => {
@@ -392,12 +378,12 @@ describe("DeleteTask: branch of deleting the task of given todo ", () => {
       "Brush Teeth for 5 mintues",
     );
   });
-  it(" MarkTaskDone: should list complete a task in a todo", () => {
+  it(" DeleteTask: should delete one  task in a todo", () => {
     memory.deleteTask(dbName, "Morning Routine", "brush");
 
     assertEquals(memory.listTasks(dbName, "Morning Routine"), []);
   });
-  it(" MarkTaskDone: should delete both  task of a todo", () => {
+  it(" DeleteTask: should delete both  task of a todo", () => {
     memory.addTaskInToDo(
       dbName,
       "Morning Routine",
@@ -409,7 +395,7 @@ describe("DeleteTask: branch of deleting the task of given todo ", () => {
 
     assertEquals(memory.listTasks(dbName, "Morning Routine"), []);
   });
-  it(" MarkTaskDone: delete one tasks", () => {
+  it(" DeleteTask: delete one tasks", () => {
     memory.addTaskInToDo(
       dbName,
       "Morning Routine",
@@ -423,5 +409,16 @@ describe("DeleteTask: branch of deleting the task of given todo ", () => {
       task_desc: "bath with cold water",
       task_name: "bath",
     }]);
+  });
+  it(" DeleteTask: should throw error if the db is empty", () => {
+    memory.addTaskInToDo(
+      dbName,
+      "Morning Routine",
+      "bath",
+      "bath with cold water",
+    );
+    assertThrows(() =>
+      memory.deleteTask(undefined, "Morning Routine", "brush")
+    );
   });
 });
