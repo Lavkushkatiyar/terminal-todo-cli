@@ -23,6 +23,13 @@
 
 Todo List -
 
+## todo
+
+- todo_id primary Key autoIncrement
+- todo_name Text not Null
+- completed Text not null
+- creation_time Default CURRENT_TIMESTAMP
+
 ## task
 
 - task_id primary Key autoIncrement
@@ -34,9 +41,20 @@ Todo List -
 # In memory Structure
 
 ```js
-TODO{[
+tables = {}
 
-## tasks = {task_id ,name , description , completed , creation_time}
+TODO{[
+todos = ["todo1","todo2"];
+task = ["task1","task2"];
+todos = [
+"todo1": {todo_id,todo_name,completed,creationTime},
+"todo2": {todo_id,todo_name,completed,creationTime}
+]
+tasks = [
+"task1": {task_id,task_name,desc,completed,creationTime},
+"task2": {task_id,task_name,desc,completed,creationTime},
+]
+ 
 ]
 }
 ```
@@ -57,6 +75,6 @@ TODO{[
 # task To do
 
 - [] import all the dependencies (@inquirer/prompts)
-- [] create the directory Structure
+- [Y] create the directory Structure
 - [] add task to task to dev (coverage , test )
 - [] add files in gitIgnore (Plan.md ,gitIgnore,coverage)
