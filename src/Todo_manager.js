@@ -1,23 +1,45 @@
-export const manageInventory = (db, InventoryClass, cliArgs) => {
-  const inventoryService = new InventoryClass(db);
+import { parser } from "./parser.js";
 
+export const todoManager = (db, todoClass, cliArgs) => {
+  const todoService = new todoClass();
   const { command, ...options } = parser(cliArgs);
-
+  let list;
   switch (command) {
-    case "init":
-      inventoryService.initlizeDb(db, options);
+    case "listTodo":
+      list = todoService.listTodo(db, options);
       break;
-    case "update":
-      inventoryService.updateItemOfInventory(db, options);
+    case "listTasks":
+      list = todoService.listTasks(db, options);
       break;
-    case "add":
-      inventoryService.addItemToInventory(db, options);
+    case "addToDo":
+      todoService.addToDo(db, options);
       break;
-    case "list":
-      inventoryService.listInventory(db, options);
+    case "addTaskInToDo":
+      todoService.addTaskInToDo(db, options);
+      break;
+    case "markTaskDone":
+      todoService.markTaskDone(db, options);
+      break;
+    case "deleteTask":
+      todoService.deleteTask(db, options);
+      break;
+    case "deleteTodo":
+      todoService.deleteTodo(db, options);
       break;
 
     default:
       throw new Error("command is Invalid");
   }
+  if (list && command === "listTodo") {
+    const todos = list.content.map((
+      { todo_id, todo_name, todo_desc },
+    ) => ({
+      todo_id,
+      todo_name,
+      todo_desc,
+    }));
+    console.table(todos);
+    return;
+  }
+  if (list) console.table(list.content);
 };
