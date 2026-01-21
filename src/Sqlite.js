@@ -1,3 +1,5 @@
+import { connect } from "node:http2";
+
 export class sqLiteTodoClass {
   createToDoTable(db) {
     if (!db) throw new Error("db is undefined");
@@ -39,14 +41,13 @@ export class sqLiteTodoClass {
     ).get(todo_name);
     return !!isExist;
   }
-  createToDo(db, { todo_name, todo_desc }) {
+  addToDo(db, { todo_name, todo_desc }) {
     if (db === undefined || todo_name === undefined) {
       throw new Error("db is undefined");
     }
     if (this.isToDoAlreadyExist(db, todo_name)) {
       throw new Error("TODO is Already Exist");
     }
-
     const addData = db.prepare(`
       INSERT INTO todos (todo_name, todo_desc)
       VALUES (?, ?)
@@ -59,8 +60,8 @@ export class sqLiteTodoClass {
     if (db === undefined) {
       throw new Error("db is undefined");
     }
-    const display = db.prepare(`SELECT * FROM todos`).all();
-    return display;
+    const content = db.prepare(`SELECT * FROM todos`).all();
+    return { success: true, content };
   }
   deleteTodo(db, { todo_name }) {
     if (db === undefined) {
@@ -89,7 +90,7 @@ export class sqLiteTodoClass {
 
     addTaskQuery.run(todo.id, task_name, task_desc);
   }
-  markTaskASdone(db, { todo_name, task_name }) {
+  markTaskDone(db, { todo_name, task_name }) {
     if (db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
@@ -109,14 +110,15 @@ export class sqLiteTodoClass {
     updateTaskQuery.run(task_name, todo.id);
   }
 
-  listTaskOfATodo(db, { todo_name }) {
+  listTasks(db, { todo_name }) {
     const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
       todo_name,
     );
-    const display = db.prepare(`SELECT * FROM task where todo_id = ?`).all(
+    const content = db.prepare(`SELECT * FROM task where todo_id = ?`).all(
       todo.id,
     );
-    return display;
+
+    return { success: true, content };
   }
   deleteTask(db, { todo_name, task_name }) {
     const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(

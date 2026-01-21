@@ -2,13 +2,12 @@ import { input, select } from "npm:@inquirer/prompts";
 
 import { todoManager } from "./Todo_manager.js";
 
-const dbChoices = [
+export const dbChoices = [
   { name: "In-Memory", value: "inMemory", description: "Uses in-memory DB" },
   {
     name: "SQLite 3",
     value: "sqlite",
     description: "Use sqlite Database",
-    disabled: "will implement soon",
   },
 ];
 
@@ -52,7 +51,7 @@ const operations = [
   { name: "Exit", value: "exit", description: "Quit the app" },
 ];
 
-const chooseDatabase = async () => {
+export const chooseDatabase = async () => {
   const db = await select({
     message: "Select Database",
     choices: dbChoices,
@@ -184,12 +183,11 @@ const collectArgsForOperation = async (db, handler, op) => {
   }
 };
 
-export const runCli = async (db, todoHandler) => {
-  let database = await chooseDatabase();
+export const runCli = async (db, todoHandler, databaseChoice) => {
   while (true) {
     try {
       const operation = await select({
-        message: `Database: ${database} — Select operation`,
+        message: `Database: ${databaseChoice} — Select operation`,
         choices: operations,
         loop: false,
         limit: 10,
@@ -202,12 +200,14 @@ export const runCli = async (db, todoHandler) => {
       }
 
       if (operation === "changeDB") {
-        database = await chooseDatabase();
+        databaseChoice = await chooseDatabase();
         continue;
       }
 
       const args = await collectArgsForOperation(db, todoHandler, operation);
       const userChoice = [operation, ...args];
+      console.log({ operation });
+
       await todoManager(db, todoHandler, userChoice);
     } catch (err) {
       console.log(err.message);

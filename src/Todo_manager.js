@@ -31,9 +31,9 @@ export const todoManager = (db, todoService, cliArgs) => {
   }
   if (list && command === "listTodo") {
     const todos = list.content.map((
-      { todo_id, todo_name, todo_desc },
+      { id, todo_name, todo_desc },
     ) => ({
-      todo_id,
+      id,
       todo_name,
       todo_desc,
     }));
