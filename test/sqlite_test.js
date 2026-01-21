@@ -216,6 +216,7 @@ describe("DELETE_TODO : branch of DELETING todos table ", () => {
     assertThrows(() => memory.deleteTodo(undefined, {}));
   });
 });
+
 describe("addTaskInToDo : branch of adding task in  tasks table ", () => {
   let memory;
   let mockDb;
@@ -365,6 +366,7 @@ describe("listTasks : branch of listing task  ", () => {
     assertEquals(listTasks, taskData);
   });
 });
+
 describe("markTaskAsDone : branch of marking task as done in task table  ", () => {
   let memory;
   let mockDb;
@@ -434,5 +436,47 @@ describe("markTaskAsDone : branch of marking task as done in task table  ", () =
 
   it("markTaskAsDone:  should throw error provided undefined table ", () => {
     assertThrows(() => memory.mark(undefined, {}));
+  });
+});
+describe("deleteTask : branch of deleting  task from task table  ", () => {
+  let memory;
+  let mockDb;
+  beforeEach(() => {
+    memory = new sqLiteTodoClass();
+    mockDb = new DatabaseSync(":memory:");
+    memory.createToDoTable(mockDb);
+    memory.createTasksTable(mockDb);
+    const todo = {
+      todo_name: "Morning",
+      todo_desc: "thingsTO do in morning",
+    };
+    memory.createToDo(mockDb, todo);
+    const task = {
+      todo_name: "Morning",
+      task_name: "brush",
+      task_desc: "do brush for 5 mintues",
+    };
+
+    memory.addTaskInTodo(mockDb, task);
+  });
+  it("deleteTask:  deleting one task  ", () => {
+    const task1 = {
+      todo_name: "Morning",
+      task_name: "bath",
+      task_desc: "do brush for 5 mintues",
+    };
+
+    memory.addTaskInTodo(mockDb, task1);
+    memory.deleteTask(mockDb, { todo_name: "Morning", task_name: "bath" });
+
+    assertEquals(memory.listTaskOfATodo(mockDb, { todo_name: "Morning" }), [
+      {
+        complete: "false",
+        id: 1,
+        task_desc: "do brush for 5 mintues",
+        task_name: "brush",
+        todo_id: 1,
+      },
+    ]);
   });
 });

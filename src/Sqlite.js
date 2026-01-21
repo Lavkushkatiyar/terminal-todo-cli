@@ -118,4 +118,13 @@ export class sqLiteTodoClass {
     );
     return display;
   }
+  deleteTask(db, { todo_name, task_name }) {
+    const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
+      todo_name,
+    );
+    db.prepare(`
+  delete from task where todo_id = ? and task_name = ?
+  `).run(todo.id, task_name);
+    return { success: true };
+  }
 }
