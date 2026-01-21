@@ -71,4 +71,51 @@ export class sqLiteTodoClass {
       `);
     deleteQuery.run(todo_name);
   }
+  addTaskInTodo(db, { todo_name, task_name, task_desc }) {
+    if (db === undefined || todo_name === undefined) {
+      throw new Error(" doesn't exist");
+    }
+    if (!this.isToDoAlreadyExist(db, todo_name)) {
+      throw new Error("todo doesn't exist");
+    }
+    const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
+      todo_name,
+    );
+
+    const addTaskQuery = db.prepare(`
+  INSERT INTO task (todo_id, task_name, task_desc)
+  VALUES (?, ?, ?)
+`);
+
+    addTaskQuery.run(todo.id, task_name, task_desc);
+  }
+  markTaskASdone(db, { todo_name, task_name }) {
+    if (db === undefined || todo_name === undefined) {
+      throw new Error(" doesn't exist");
+    }
+    if (!this.isToDoAlreadyExist(db, todo_name)) {
+      throw new Error("todo doesn't exist");
+    }
+
+    const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
+      todo_name,
+    );
+
+    const updateTaskQuery = db.prepare(`
+  UPDATE task
+  SET complete = 'done'
+  WHERE task_name = ? AND todo_id = ?
+`);
+    updateTaskQuery.run(task_name, todo.id);
+  }
+
+  listTaskOfATodo(db, { todo_name }) {
+    const todo = db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
+      todo_name,
+    );
+    const display = db.prepare(`SELECT * FROM task where todo_id = ?`).all(
+      todo.id,
+    );
+    return display;
+  }
 }
