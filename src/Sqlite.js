@@ -5,7 +5,7 @@ export class sqLiteTodoClass {
     db.exec(`
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      todo_name TEXT NOT NULL,
+      todo_name TEXT NOT NULL UNIQUE,
       todo_desc TEXT NOT NULL
     ) STRICT;
   `);
@@ -53,5 +53,22 @@ export class sqLiteTodoClass {
     `);
 
     addData.run(todo_name, todo_desc);
+  }
+
+  listTodo(db) {
+    if (db === undefined) {
+      throw new Error("db is undefined");
+    }
+    const display = db.prepare(`SELECT * FROM todos`).all();
+    return display;
+  }
+  deleteTodo(db, { todo_name }) {
+    if (db === undefined) {
+      throw new Error("db is undefined");
+    }
+    const deleteQuery = db.prepare(`
+      delete from todos where todo_name = ?
+      `);
+    deleteQuery.run(todo_name);
   }
 }
