@@ -6,6 +6,7 @@ export const main = () => {
   const todoService = new memoryTodoClass();
   db = todoService.createDB();
   db = todoService.initializeDB(db);
-  runCli(db, memoryTodoClass);
+
+  runCli(db, todoService);
 };
 main();

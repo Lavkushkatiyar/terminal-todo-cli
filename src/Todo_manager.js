@@ -1,7 +1,6 @@
 import { parser } from "./parser.js";
 
-export const todoManager = (db, todoClass, cliArgs) => {
-  const todoService = new todoClass();
+export const todoManager = (db, todoService, cliArgs) => {
   const { command, ...options } = parser(cliArgs);
   let list;
   switch (command) {

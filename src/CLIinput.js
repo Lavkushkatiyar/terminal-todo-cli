@@ -61,7 +61,7 @@ const chooseDatabase = async () => {
   return db;
 };
 
-const collectArgsForOperation = async (op) => {
+const collectArgsForOperation = async (db, handler, op) => {
   switch (op) {
     case "addToDo": {
       const todoTitle = await input({
@@ -77,10 +77,19 @@ const collectArgsForOperation = async (op) => {
     case "listTodo":
       return [];
     case "addTaskInToDo": {
-      const todoName = await input({
-        message: "Enter ToDo name or id:",
+      const todos = handler.listTodo(db).content.map((x) => ({
+        name: x.todo_name,
+        value: x.todo_name,
+      }));
+      if (todos.length === 0) throw new Error("Create a Todo first ");
+
+      const todoName = await select({
+        message: "choose ToDo",
+        choices: todos,
+
         required: true,
       });
+
       const taskName = await input({
         message: "Enter Task name:",
         required: true,
@@ -92,75 +101,116 @@ const collectArgsForOperation = async (op) => {
       return [todoName, taskName, taskDesc ?? ""];
     }
     case "listTasks": {
-      const todoName = await input({
-        message: "Enter ToDo name or id:",
+      const todos = handler.listTodo(db).content.map((x) => ({
+        name: x.todo_name,
+        value: x.todo_name,
+      }));
+      if (todos.length === 0) throw new Error("Create a Todo first ");
+
+      const todoName = await select({
+        message: "choose ToDo",
+        choices: todos,
         required: true,
       });
       return [todoName];
     }
     case "markTaskDone": {
-      const todoName = await input({
-        message: "Enter ToDo name or id:",
+      const todos = handler.listTodo(db).content.map((x) => ({
+        name: x.todo_name,
+        value: x.todo_name,
+      }));
+      if (todos.length === 0) throw new Error("Create a Todo first ");
+      const todo_name = await select({
+        message: "choose ToDo",
+        choices: todos,
         required: true,
       });
-      const taskName = await input({
-        message: "Enter Task name or id:",
+
+      const task = handler.listTasks(db, { todo_name }).content.map((x) => ({
+        name: x.task_name,
+        value: x.task_name,
+      }));
+      if (task.length === 0) throw new Error("Create a Task First");
+      const taskName = await select({
+        choices: task,
+        message: "Select Task :",
         required: true,
       });
-      return [todoName, taskName];
+      return [todo_name, taskName];
     }
     case "deleteTask": {
-      const todoName = await input({
-        message: "Enter ToDo name or id:",
+      const todos = handler.listTodo(db).content.map((x) => ({
+        name: x.todo_name,
+        value: x.todo_name,
+      }));
+      if (todos.length === 0) throw new Error("Create a Todo first ");
+
+      const todo_name = await select({
+        message: "choose ToDo",
+        choices: todos,
         required: true,
       });
-      const taskName = await input({
+
+      const task = handler.listTasks(db, { todo_name }).content.map((x) => ({
+        name: x.task_name,
+        value: x.task_name,
+      }));
+      if (task.length === 0) throw new Error("Create a Task first ");
+
+      const taskName = await select({
+        choices: task,
         message: "Enter Task name or id:",
         required: true,
       });
-      return [todoName, taskName];
+      return [todo_name, taskName];
     }
     case "deleteTodo": {
-      const todoName = await input({
-        message: "Enter ToDo name:",
+      const todos = handler.listTodo(db).content.map((x) => ({
+        name: x.todo_name,
+        value: x.todo_name,
+      }));
+      if (todos.length === 0) throw new Error("Create a Todo first ");
+
+      const todo_name = await select({
+        message: "choose ToDo",
+        choices: todos,
         required: true,
       });
-      return [todoName];
+
+      return [todo_name];
     }
     default:
       return [];
   }
 };
 
-export const runCli = async (db, managerClass) => {
+export const runCli = async (db, todoHandler) => {
   let database = await chooseDatabase();
   while (true) {
-    const operation = await select({
-      message: `Database: ${database} — Select operation`,
-      choices: operations,
-      loop: false,
-      limit: 10,
-    });
-    console.clear();
-
-    if (operation === "exit") {
-      console.log("Goodbye");
-      break;
-    }
-
-    if (operation === "changeDB") {
-      database = await chooseDatabase();
-      continue;
-    }
-
-    const args = await collectArgsForOperation(operation);
-
-    const userChoice = [operation, ...args];
-
     try {
-      await todoManager(db, managerClass, userChoice);
+      const operation = await select({
+        message: `Database: ${database} — Select operation`,
+        choices: operations,
+        loop: false,
+        limit: 10,
+      });
+      console.clear();
+
+      if (operation === "exit") {
+        console.log("Goodbye");
+        break;
+      }
+
+      if (operation === "changeDB") {
+        database = await chooseDatabase();
+        continue;
+      }
+
+      const args = await collectArgsForOperation(db, todoHandler, operation);
+      const userChoice = [operation, ...args];
+      await todoManager(db, todoHandler, userChoice);
     } catch (err) {
-      console.error("Error running main:", err);
+      console.log(err.message);
     }
   }
 };
