@@ -1,13 +1,13 @@
 import { DatabaseSync } from "node:sqlite";
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
-import { sqLiteTodoClass } from "../src/sqlite-class.js";
+import { SqliteTodoStore } from "../src/sqlite-class.js";
 
 describe("CreateTABLE : branch of Creating a table in the ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
   });
   it("CreateTodoTable:  creating the todos table", () => {
@@ -40,7 +40,7 @@ describe("ADD_TODO : branch of Adding a TODO in todos table ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
   });
@@ -100,7 +100,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
   });
@@ -161,7 +161,7 @@ describe("DELETE_TODO : branch of DELETING todos table ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
   });
@@ -222,7 +222,7 @@ describe("addTaskInToDo : branch of adding task in  tasks table ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
     memory.createTasksTable(mockDb);
@@ -342,7 +342,7 @@ describe("listTasks : branch of listing task  ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
     memory.createTasksTable(mockDb);
@@ -373,7 +373,7 @@ describe("markTaskDone : branch of marking task as done in task table  ", () => 
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
     memory.createTasksTable(mockDb);
@@ -444,7 +444,7 @@ describe("deleteTask : branch of deleting  task from task table  ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
-    memory = new sqLiteTodoClass();
+    memory = new SqliteTodoStore();
     mockDb = new DatabaseSync(":memory:");
     memory.createToDoTable(mockDb);
     memory.createTasksTable(mockDb);

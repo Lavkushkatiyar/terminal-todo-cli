@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { chooseDatabase, runCli } from "./src/cli-input.js";
 import { inMemoryTodoStore } from "./src/memory.js";
-import { sqLiteTodoClass } from "./src/sqlite-class.js";
+import { SqliteTodoStore } from "./src/sqlite-class.js";
 
 export const main = async () => {
   const databaseChoice = await chooseDatabase();
@@ -13,7 +13,7 @@ export const main = async () => {
     runCli(db, todoService, databaseChoice);
   } else {
     const db = new DatabaseSync("ToDo.db");
-    const todoService = new sqLiteTodoClass();
+    const todoService = new SqliteTodoStore();
     todoService.createToDoTable(db);
     todoService.createTasksTable(db);
 
