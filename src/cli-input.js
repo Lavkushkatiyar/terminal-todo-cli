@@ -183,12 +183,125 @@ const collectArgsForOperation = async (db, handler, op) => {
   }
 };
 
+/**
+ * Manage a single todo with a mini-menu.
+ * Only UI logic lives here; all actions call todoManager exactly as before.
+ */
+const manageTodoMenu = async (db, todoHandler, todo_name) => {
+  const manageActions = [
+    { name: "Create Task", value: "addTaskInToDo" },
+    { name: "List Tasks", value: "listTasks" },
+    { name: "Mark Task Done", value: "markTaskDone" },
+    { name: "Delete Task", value: "deleteTask" },
+    { name: "Delete Todo", value: "deleteTodo" },
+    { name: "Back", value: "back" },
+  ];
+
+  while (true) {
+    try {
+      const choice = await select({
+        message: `Manage ToDo: ${todo_name} — choose action`,
+        choices: manageActions,
+        loop: false,
+      });
+
+      if (choice === "back") return;
+
+      switch (choice) {
+        case "addTaskInToDo": {
+          const taskName = await input({
+            message: "Enter Task name:",
+            required: true,
+          });
+          const taskDesc = await input({
+            message: "Enter Task description:",
+            required: false,
+          });
+          await todoManager(db, todoHandler, [
+            "addTaskInToDo",
+            todo_name,
+            taskName,
+            taskDesc ?? "",
+          ]);
+          break;
+        }
+        case "listTasks": {
+          await todoManager(db, todoHandler, ["listTasks", todo_name]);
+          break;
+        }
+        case "markTaskDone": {
+          const tasks = todoHandler
+            .listTasks(db, { todo_name })
+            .content.map((t) => ({ name: t.task_name, value: t.task_name }));
+          if (tasks.length === 0) {
+            console.log("Create a Task first");
+            break;
+          }
+          const taskName = await select({
+            message: "Select Task to mark done:",
+            choices: tasks,
+            required: true,
+          });
+          await todoManager(db, todoHandler, [
+            "markTaskDone",
+            todo_name,
+            taskName,
+          ]);
+          break;
+        }
+        case "deleteTask": {
+          const tasks = todoHandler
+            .listTasks(db, { todo_name })
+            .content.map((t) => ({ name: t.task_name, value: t.task_name }));
+          if (tasks.length === 0) {
+            console.log("Create a Task first");
+            break;
+          }
+          const taskName = await select({
+            message: "Select Task to delete:",
+            choices: tasks,
+            required: true,
+          });
+          await todoManager(db, todoHandler, [
+            "deleteTask",
+            todo_name,
+            taskName,
+          ]);
+          break;
+        }
+        case "deleteTodo": {
+          await todoManager(db, todoHandler, ["deleteTodo", todo_name]);
+          return;
+        }
+        default:
+          return;
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+};
+
 export const runCli = async (db, todoHandler, databaseChoice) => {
   while (true) {
     try {
+      const todosList = todoHandler.listTodo(db).content || [];
+      const todosExist = todosList.length > 0;
+
+      const allowedTaskOps = new Set([
+        "addTaskInToDo",
+        "listTasks",
+        "markTaskDone",
+        "deleteTask",
+        "deleteTodo",
+      ]);
+      const choices = operations.filter((op) =>
+        todosExist ? true : !allowedTaskOps.has(op.value)
+      );
+
       const operation = await select({
         message: `Database: ${databaseChoice} — Select operation`,
-        choices: operations,
+        choices,
         loop: false,
         limit: 10,
       });
@@ -204,9 +317,43 @@ export const runCli = async (db, todoHandler, databaseChoice) => {
         continue;
       }
 
+      if (operation === "listTodo") {
+        const todos = todoHandler.listTodo(db).content.map((x) => ({
+          name: x.todo_name,
+          value: x.todo_name,
+        }));
+
+        if (todos.length === 0) {
+          await todoManager(db, todoHandler, ["listTodo"]);
+          continue;
+        }
+
+        const todoChoiceOptions = [
+          { name: "Show all todos (raw list)", value: "__SHOW_ALL__" },
+          ...todos,
+          { name: "Back to main menu", value: "__BACK__" },
+        ];
+
+        const chosen = await select({
+          message: "Select a ToDo to manage (or show all):",
+          choices: todoChoiceOptions,
+          loop: false,
+        });
+
+        if (chosen === "__BACK__") {
+          continue;
+        }
+        if (chosen === "__SHOW_ALL__") {
+          await todoManager(db, todoHandler, ["listTodo"]);
+          continue;
+        }
+
+        await manageTodoMenu(db, todoHandler, chosen);
+        continue;
+      }
+
       const args = await collectArgsForOperation(db, todoHandler, operation);
       const userChoice = [operation, ...args];
-      console.log({ operation });
 
       await todoManager(db, todoHandler, userChoice);
     } catch (err) {

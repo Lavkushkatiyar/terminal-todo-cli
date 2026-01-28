@@ -1,5 +1,3 @@
-import { connect } from "node:http2";
-
 export class sqLiteTodoClass {
   createToDoTable(db) {
     if (!db) throw new Error("db is undefined");

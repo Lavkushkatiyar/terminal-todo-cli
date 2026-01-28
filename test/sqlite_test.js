@@ -1,7 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
-import { sqLiteTodoClass } from "../src/Sqlite.js";
+import { sqLiteTodoClass } from "../src/sqlite-class.js";
 
 describe("CreateTABLE : branch of Creating a table in the ", () => {
   let memory;
@@ -110,7 +110,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
       todo_desc: "thingsTO do in morning",
     };
     memory.addToDo(mockDb, todo);
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, [{
       id: 1,
       todo_desc: "thingsTO do in morning",
@@ -123,7 +123,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
       todo_desc: "thingsTO do in morning",
     };
     memory.addToDo(mockDb, todo);
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, [{
       id: 1,
       todo_desc: "thingsTO do in morning",
@@ -141,7 +141,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
     };
     memory.addToDo(mockDb, todo);
     memory.addToDo(mockDb, todo1);
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, [{
       id: 1,
       todo_desc: "thingsTO do in morning",
@@ -172,7 +172,7 @@ describe("DELETE_TODO : branch of DELETING todos table ", () => {
     };
     memory.addToDo(mockDb, todo);
     memory.deleteTodo(mockDb, { todo_name: todo.todo_name });
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, []);
   });
   it("Delete_todo:  deleting the first todo only ", () => {
@@ -189,7 +189,7 @@ describe("DELETE_TODO : branch of DELETING todos table ", () => {
 
     memory.deleteTodo(mockDb, { todo_name: todo.todo_name });
 
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, [{
       id: 2,
       todo_desc: "thingsTO do in evening",
@@ -209,7 +209,7 @@ describe("DELETE_TODO : branch of DELETING todos table ", () => {
     memory.addToDo(mockDb, todo1);
     memory.deleteTodo(mockDb, { todo_name: todo.todo_name });
     memory.deleteTodo(mockDb, { todo_name: todo1.todo_name });
-    const todoTable = memory.listTodo(mockDb);
+    const todoTable = memory.listTodo(mockDb).content;
     assertEquals(todoTable, []);
   });
 
@@ -361,7 +361,8 @@ describe("listTasks : branch of listing task  ", () => {
   });
 
   it("listTasks:  listing all task of a todo ", () => {
-    const listTasks = memory.listTasks(mockDb, { todo_name: "Morning" });
+    const listTasks =
+      memory.listTasks(mockDb, { todo_name: "Morning" }).content;
     const taskData = mockDb.prepare(`SELECT * FROM task`).all();
 
     assertEquals(listTasks, taskData);
@@ -401,7 +402,7 @@ describe("markTaskDone : branch of marking task as done in task table  ", () => 
     memory.markTaskDone(mockDb, { todo_name: "Morning", task_name: "brush" });
     memory.markTaskDone(mockDb, { todo_name: "Morning", task_name: "bath" });
 
-    const taskData = mockDb.prepare(`SELECT * FROM task`).all();
+    const taskData = memory.listTasks(mockDb, { todo_name: "Morning" }).content;
 
     assertEquals(taskData, [
       {
@@ -469,8 +470,9 @@ describe("deleteTask : branch of deleting  task from task table  ", () => {
 
     memory.addTaskInTodo(mockDb, task1);
     memory.deleteTask(mockDb, { todo_name: "Morning", task_name: "bath" });
-
-    assertEquals(memory.listTasks(mockDb, { todo_name: "Morning" }), [
+    const taskContent =
+      memory.listTasks(mockDb, { todo_name: "Morning" }).content;
+    assertEquals(taskContent, [
       {
         complete: "false",
         id: 1,

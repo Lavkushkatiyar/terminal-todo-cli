@@ -12,6 +12,7 @@ describe("branch of Creating memory ", () => {
     assertEquals(db, { tables: {} });
   });
 });
+
 describe("Initialize branch of  memory ", () => {
   let memory;
   beforeEach(() => {
