@@ -1,14 +1,14 @@
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertThrows } from "@std/assert";
-import { memoryTodoClass } from "../src/memory.js";
+import { inMemoryTodoStore } from "../src/memory.js";
 
 describe("branch of Creating memory ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
   it("simple Functions call to create A db", () => {
-    const db = memory.createDB();
+    const db = memory.createDb();
     assertEquals(db, { tables: {} });
   });
 });
@@ -16,27 +16,27 @@ describe("branch of Creating memory ", () => {
 describe("Initialize branch of  memory ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
-  it(" initializeDB: should initialize the db when provided table", () => {
-    const dbName = memory.createDB();
-    const initializedDB = memory.initializeDB(dbName);
+  it(" initializeDb: should initialize the db when provided table", () => {
+    const dbName = memory.createDb();
+    const initializedDB = memory.initializeDb(dbName);
 
     assertEquals(initializedDB, { tables: { todos: [] } });
   });
-  it(" initializeDB: should throw Error if db is undefined ", () => {
-    assertThrows(() => memory.initializeDB(undefined));
+  it(" initializeDb: should throw Error if db is undefined ", () => {
+    assertThrows(() => memory.initializeDb(undefined));
   });
 });
 
 describe("AddTODO: branch of  memory ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
   it(" addTODO: should add a todo in the db", () => {
-    const dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    const dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     memory.addToDo(
       dbName,
@@ -46,7 +46,7 @@ describe("AddTODO: branch of  memory ", () => {
       },
     );
 
-    assertEquals(memory.listTodo(dbName).content, [
+    assertEquals(memory.listTodos(dbName).content, [
       {
         tasks: [],
         todo_desc: "things To do in morning",
@@ -56,9 +56,9 @@ describe("AddTODO: branch of  memory ", () => {
     ]);
   });
   it(" addTODO: Multiple todo added add a todo in the db", () => {
-    const dbName = memory.createDB();
+    const dbName = memory.createDb();
     const tables = ["todos", "tasks"];
-    memory.initializeDB(dbName, tables);
+    memory.initializeDb(dbName, tables);
     memory.addToDo(
       dbName,
       { todo_name: "Morning Routine", todo_desc: "things To do in morning" },
@@ -71,7 +71,7 @@ describe("AddTODO: branch of  memory ", () => {
       },
     );
 
-    assertEquals(memory.listTodo(dbName).content, [
+    assertEquals(memory.listTodos(dbName).content, [
       {
         tasks: [],
         todo_desc: "things To do in morning",
@@ -104,9 +104,9 @@ describe("DeleteTODO: branch of  memory ", () => {
   let memory;
   let dbName;
   beforeEach(() => {
-    memory = new memoryTodoClass();
-    dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    memory = new inMemoryTodoStore();
+    dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     memory.addToDo(
       dbName,
@@ -119,12 +119,12 @@ describe("DeleteTODO: branch of  memory ", () => {
   it(" DELETE TODO: should delete a todo in the db", () => {
     memory.deleteTodo(dbName, "Morning Routine ");
 
-    assertEquals(memory.listTodo(dbName).content, []);
+    assertEquals(memory.listTodos(dbName).content, []);
   });
   it(" DeleteTODO: Deleted one of todo one remains", () => {
-    const dbName = memory.createDB();
+    const dbName = memory.createDb();
     const tables = ["todos", "tasks"];
-    memory.initializeDB(dbName, tables);
+    memory.initializeDb(dbName, tables);
     memory.addToDo(
       dbName,
       {
@@ -141,7 +141,7 @@ describe("DeleteTODO: branch of  memory ", () => {
     );
 
     memory.deleteTodo(dbName, "Morning Routine");
-    assertEquals(memory.listTodo(dbName).content, [
+    assertEquals(memory.listTodos(dbName).content, [
       {
         tasks: [],
         todo_desc: "things To do in morning",
@@ -163,11 +163,11 @@ describe("DeleteTODO: branch of  memory ", () => {
 describe("ListTODO: branch of listing the todo in   memory ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
   it(" listToDo: should add a todo in the db", () => {
-    const dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    const dbName = memory.createDb();
+    memory.initializeDb(dbName);
     memory.addToDo(
       dbName,
       {
@@ -176,7 +176,7 @@ describe("ListTODO: branch of listing the todo in   memory ", () => {
       },
     );
 
-    assertEquals(memory.listTodo(dbName), {
+    assertEquals(memory.listTodos(dbName), {
       success: true,
       content: [
         {
@@ -191,17 +191,17 @@ describe("ListTODO: branch of listing the todo in   memory ", () => {
 
   it(" listToDo: should throw Error if db is undefined ", () => {
     const dbName = undefined;
-    assertThrows(() => memory.listTodo(dbName));
+    assertThrows(() => memory.listTodos(dbName));
   });
 });
 describe("addTaskInToDo: branch of  memory ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
   it(" addTaskInToDo: should add a task in  todo", () => {
-    const dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    const dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     const addedItemDb = memory.addToDo(
       dbName,
@@ -230,8 +230,8 @@ describe("addTaskInToDo: branch of  memory ", () => {
     ]);
   });
   it(" addTaskInToDo: should add two  task in  one todo", () => {
-    const dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    const dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     const addedItemDb = memory.addToDo(
       dbName,
@@ -287,11 +287,11 @@ describe("addTaskInToDo: branch of  memory ", () => {
 describe("listTasks: branch of listing the task of given todo ", () => {
   let memory;
   beforeEach(() => {
-    memory = new memoryTodoClass();
+    memory = new inMemoryTodoStore();
   });
   it(" listTasks: should list task of a todo", () => {
-    const dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    const dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     memory.addToDo(
       dbName,
@@ -330,9 +330,9 @@ describe("MarkTaskDone: branch of marking Task done of given todo ", () => {
   let memory;
   let dbName;
   beforeEach(() => {
-    memory = new memoryTodoClass();
-    dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    memory = new inMemoryTodoStore();
+    dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     memory.addToDo(
       dbName,
@@ -409,9 +409,9 @@ describe("DeleteTask: branch of deleting the task of given todo ", () => {
   let memory;
   let dbName;
   beforeEach(() => {
-    memory = new memoryTodoClass();
-    dbName = memory.createDB();
-    memory.initializeDB(dbName);
+    memory = new inMemoryTodoStore();
+    dbName = memory.createDb();
+    memory.initializeDb(dbName);
 
     memory.addToDo(
       dbName,

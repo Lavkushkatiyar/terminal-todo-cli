@@ -1,7 +1,7 @@
-export class memoryTodoClass {
-  i = 1;
+export class inMemoryTodoStore {
+  #nextId = 1;
 
-  findTODOindex(todo, todo_name) {
+  findTodoIndex(todo, todo_name) {
     return todo.findIndex((x) => x.todo_name === todo_name);
   }
 
@@ -9,11 +9,11 @@ export class memoryTodoClass {
     return todo.findIndex((x) => x.task_name === task_name);
   }
 
-  createDB() {
+  createDb() {
     return { tables: {} };
   }
 
-  initializeDB(db) {
+  initializeDb(db) {
     if (db === undefined) {
       throw new Error("DB is Undefined");
     }
@@ -26,7 +26,7 @@ export class memoryTodoClass {
       throw new Error("DB is Undefined");
     }
     db.tables.todos.push({
-      todo_id: this.i++,
+      todo_id: this.#nextId++,
       todo_name,
       todo_desc,
       tasks: [],
@@ -34,7 +34,7 @@ export class memoryTodoClass {
     return db.tables.todos;
   }
 
-  listTodo(db) {
+  listTodos(db) {
     if (db === undefined) {
       throw new Error("DB is Undefined");
     }
@@ -44,7 +44,7 @@ export class memoryTodoClass {
 
   addTaskInToDo(db, { todo_name, task_name, task_desc }) {
     if (db === undefined) throw new Error("DB is Undefined");
-    const todo = this.findTODOindex(db.tables.todos, todo_name);
+    const todo = this.findTodoIndex(db.tables.todos, todo_name);
     db.tables.todos[todo].tasks.push({
       task_name,
       task_desc,
@@ -55,16 +55,19 @@ export class memoryTodoClass {
 
   listTasks(db, { todo_name }) {
     if (db === undefined) throw new Error("DB is Undefined");
-    const todo = this.findTODOindex(db.tables.todos, todo_name);
+
+    const todo = this.findTodoIndex(db.tables.todos, todo_name);
     const content = db.tables.todos[todo].tasks;
+
     return { success: true, content };
   }
 
   markTaskDone(db, { todo_name, task_name }) {
     if (db === undefined) throw new Error("DB is Undefined");
 
-    const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
+    const todoIndex = this.findTodoIndex(db.tables.todos, todo_name);
     const todo = db.tables.todos[todoIndex].tasks;
+
     const taskIndex = this.findTaskIndex(todo, task_name);
     todo[taskIndex].completed = true;
   }
@@ -72,16 +75,17 @@ export class memoryTodoClass {
   deleteTask(db, { todo_name, task_name }) {
     if (db === undefined) throw new Error("DB is Undefined");
 
-    const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
+    const todoIndex = this.findTodoIndex(db.tables.todos, todo_name);
     const todo = db.tables.todos[todoIndex].tasks;
     const taskIndex = this.findTaskIndex(todo, task_name);
+
     todo.splice(taskIndex, 1);
   }
 
   deleteTodo(db, { todo_name }) {
     if (db === undefined) throw new Error("DB is Undefined");
 
-    const todoIndex = this.findTODOindex(db.tables.todos, todo_name);
+    const todoIndex = this.findTodoIndex(db.tables.todos, todo_name);
     const todosList = db.tables.todos;
     todosList.splice(todoIndex, 1);
   }
