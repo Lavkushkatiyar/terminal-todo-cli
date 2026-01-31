@@ -1,3 +1,6 @@
+import { error } from "node:console";
+import { parse } from "node:path";
+
 const handleTodoAdd = (args, parser) => {
   parser.todo_name = args[0];
   parser.todo_desc = args[1];
@@ -42,6 +45,9 @@ export const parser = (args) => {
     task_desc: "",
   };
   parsed.command = args[0];
+  if (!options[parsed.command]) {
+    throw new Error("command not found");
+  }
   options[parsed.command](args.slice(1), parsed);
 
   return parsed;
