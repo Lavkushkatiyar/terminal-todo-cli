@@ -7,3 +7,7 @@
   3. ---- all the variable name meaningful and consistent.
 
   4. memory-class.js
+
+  ```js
+  [✅] 5 . i have to fix the test cases description to increase consistency
+  ```

@@ -10,14 +10,14 @@ export const main = async () => {
     const todoService = new inMemoryTodoStore();
     db = todoService.createDb();
     db = todoService.initializeDb(db);
-    runCli(db, todoService, databaseChoice);
+    runCli(todoService, databaseChoice, db);
   } else {
     const db = new DatabaseSync("ToDo.db");
-    const todoService = new SqliteTodoStore();
-    todoService.createToDoTable(db);
-    todoService.createTasksTable(db);
+    const todoService = new SqliteTodoStore(db);
+    todoService.createToDoTable();
+    todoService.createTasksTable();
 
-    runCli(db, todoService, databaseChoice);
+    runCli(todoService, databaseChoice);
   }
 };
 main();

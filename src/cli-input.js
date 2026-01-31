@@ -1,6 +1,6 @@
 import { input, select } from "npm:@inquirer/prompts";
 
-import { todoManager } from "./Todo_manager.js";
+import { todoManager } from "./todo-manager.js";
 
 export const dbChoices = [
   { name: "In-Memory", value: "inMemory", description: "Uses in-memory DB" },
@@ -52,15 +52,14 @@ const operations = [
 ];
 
 export const chooseDatabase = async () => {
-  const db = await select({
+  return await select({
     message: "Select Database",
     choices: dbChoices,
     loop: false,
   });
-  return db;
 };
 
-const collectArgsForOperation = async (db, handler, op) => {
+const collectArgsForOperation = async (handler, op) => {
   switch (op) {
     case "addToDo": {
       const todoTitle = await input({
@@ -76,7 +75,7 @@ const collectArgsForOperation = async (db, handler, op) => {
     case "listTodo":
       return [];
     case "addTaskInToDo": {
-      const todos = handler.listTodo(db).content.map((x) => ({
+      const todos = handler.listTodo().content.map((x) => ({
         name: x.todo_name,
         value: x.todo_name,
       }));
@@ -100,7 +99,7 @@ const collectArgsForOperation = async (db, handler, op) => {
       return [todoName, taskName, taskDesc ?? ""];
     }
     case "listTasks": {
-      const todos = handler.listTodo(db).content.map((x) => ({
+      const todos = handler.listTodo().content.map((x) => ({
         name: x.todo_name,
         value: x.todo_name,
       }));
@@ -114,7 +113,7 @@ const collectArgsForOperation = async (db, handler, op) => {
       return [todoName];
     }
     case "markTaskDone": {
-      const todos = handler.listTodo(db).content.map((x) => ({
+      const todos = handler.listTodo().content.map((x) => ({
         name: x.todo_name,
         value: x.todo_name,
       }));
@@ -125,7 +124,7 @@ const collectArgsForOperation = async (db, handler, op) => {
         required: true,
       });
 
-      const task = handler.listTasks(db, { todo_name }).content.map((x) => ({
+      const task = handler.listTasks({ todo_name }).content.map((x) => ({
         name: x.task_name,
         value: x.task_name,
       }));
@@ -138,7 +137,7 @@ const collectArgsForOperation = async (db, handler, op) => {
       return [todo_name, taskName];
     }
     case "deleteTask": {
-      const todos = handler.listTodo(db).content.map((x) => ({
+      const todos = handler.listTodo().content.map((x) => ({
         name: x.todo_name,
         value: x.todo_name,
       }));
@@ -150,7 +149,7 @@ const collectArgsForOperation = async (db, handler, op) => {
         required: true,
       });
 
-      const task = handler.listTasks(db, { todo_name }).content.map((x) => ({
+      const task = handler.listTasks({ todo_name }).content.map((x) => ({
         name: x.task_name,
         value: x.task_name,
       }));
@@ -164,7 +163,7 @@ const collectArgsForOperation = async (db, handler, op) => {
       return [todo_name, taskName];
     }
     case "deleteTodo": {
-      const todos = handler.listTodo(db).content.map((x) => ({
+      const todos = handler.listTodo().content.map((x) => ({
         name: x.todo_name,
         value: x.todo_name,
       }));
@@ -187,7 +186,7 @@ const collectArgsForOperation = async (db, handler, op) => {
  * Manage a single todo with a mini-menu.
  * Only UI logic lives here; all actions call todoManager exactly as before.
  */
-const manageTodoMenu = async (db, todoHandler, todo_name) => {
+const manageTodoMenu = async (todoHandler, todo_name) => {
   const manageActions = [
     { name: "Create Task", value: "addTaskInToDo" },
     { name: "List Tasks", value: "listTasks" },
@@ -217,7 +216,7 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
             message: "Enter Task description:",
             required: false,
           });
-          await todoManager(db, todoHandler, [
+          await todoManager(todoHandler, [
             "addTaskInToDo",
             todo_name,
             taskName,
@@ -226,12 +225,12 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
           break;
         }
         case "listTasks": {
-          await todoManager(db, todoHandler, ["listTasks", todo_name]);
+          await todoManager(todoHandler, ["listTasks", todo_name]);
           break;
         }
         case "markTaskDone": {
           const tasks = todoHandler
-            .listTasks(db, { todo_name })
+            .listTasks({ todo_name })
             .content.map((t) => ({ name: t.task_name, value: t.task_name }));
           if (tasks.length === 0) {
             console.log("Create a Task first");
@@ -242,7 +241,7 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
             choices: tasks,
             required: true,
           });
-          await todoManager(db, todoHandler, [
+          await todoManager(todoHandler, [
             "markTaskDone",
             todo_name,
             taskName,
@@ -251,7 +250,7 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
         }
         case "deleteTask": {
           const tasks = todoHandler
-            .listTasks(db, { todo_name })
+            .listTasks({ todo_name })
             .content.map((t) => ({ name: t.task_name, value: t.task_name }));
           if (tasks.length === 0) {
             console.log("Create a Task first");
@@ -262,7 +261,7 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
             choices: tasks,
             required: true,
           });
-          await todoManager(db, todoHandler, [
+          await todoManager(todoHandler, [
             "deleteTask",
             todo_name,
             taskName,
@@ -270,7 +269,7 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
           break;
         }
         case "deleteTodo": {
-          await todoManager(db, todoHandler, ["deleteTodo", todo_name]);
+          await todoManager(todoHandler, ["deleteTodo", todo_name]);
           return;
         }
         default:
@@ -282,10 +281,10 @@ const manageTodoMenu = async (db, todoHandler, todo_name) => {
   }
 };
 
-export const runCli = async (db, todoHandler, databaseChoice) => {
+export const runCli = async (todoHandler, databaseChoice, db) => {
   while (true) {
     try {
-      const todosList = todoHandler.listTodo(db).content || [];
+      const todosList = todoHandler.listTodo().content || [];
       const todosExist = todosList.length > 0;
 
       const allowedTaskOps = new Set([
@@ -318,13 +317,13 @@ export const runCli = async (db, todoHandler, databaseChoice) => {
       }
 
       if (operation === "listTodo") {
-        const todos = todoHandler.listTodo(db).content.map((x) => ({
+        const todos = todoHandler.listTodo().content.map((x) => ({
           name: x.todo_name,
           value: x.todo_name,
         }));
 
         if (todos.length === 0) {
-          await todoManager(db, todoHandler, ["listTodo"]);
+          await todoManager(todoHandler, ["listTodo"]);
           continue;
         }
 
@@ -344,18 +343,18 @@ export const runCli = async (db, todoHandler, databaseChoice) => {
           continue;
         }
         if (chosen === "__SHOW_ALL__") {
-          await todoManager(db, todoHandler, ["listTodo"]);
+          await todoManager(todoHandler, ["listTodo"]);
           continue;
         }
 
-        await manageTodoMenu(db, todoHandler, chosen);
+        await manageTodoMenu(todoHandler, chosen);
         continue;
       }
 
-      const args = await collectArgsForOperation(db, todoHandler, operation);
+      const args = await collectArgsForOperation(todoHandler, operation);
       const userChoice = [operation, ...args];
 
-      await todoManager(db, todoHandler, userChoice);
+      await todoManager(todoHandler, userChoice);
     } catch (err) {
       console.log(err.message);
     }

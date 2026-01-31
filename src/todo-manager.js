@@ -1,29 +1,29 @@
 import { parser } from "./parser.js";
 
-export const todoManager = (db, todoService, cliArgs) => {
+export const todoManager = (todoService, cliArgs) => {
   const { command, ...options } = parser(cliArgs);
   let list;
   switch (command) {
     case "listTodo":
-      list = todoService.listTodo(db, options);
+      list = todoService.listTodo(options);
       break;
     case "listTasks":
-      list = todoService.listTasks(db, options);
+      list = todoService.listTasks(options);
       break;
     case "addToDo":
-      todoService.addToDo(db, options);
+      todoService.addToDo(options);
       break;
     case "addTaskInToDo":
-      todoService.addTaskInToDo(db, options);
+      todoService.addTask(options);
       break;
     case "markTaskDone":
-      todoService.markTaskDone(db, options);
+      todoService.markTaskDone(options);
       break;
     case "deleteTask":
-      todoService.deleteTask(db, options);
+      todoService.deleteTask(options);
       break;
     case "deleteTodo":
-      todoService.deleteTodo(db, options);
+      todoService.deleteTodo(options);
       break;
 
     default:

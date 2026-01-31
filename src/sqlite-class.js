@@ -1,31 +1,39 @@
 export class SqliteTodoStore {
-  createToDoTable(db) {
-    if (!db) throw new Error("db is undefined");
-
-    db.exec(`
+  #db;
+  constructor(db) {
+    this.#db = db;
+  }
+  createToDoTable() {
+    if (!this.#db) {
+      throw new Error("db is undefined");
+    }
+    const query = `
     CREATE TABLE IF NOT EXISTS todos (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       todo_name TEXT NOT NULL UNIQUE,
       todo_desc TEXT NOT NULL
     ) STRICT;
-  `);
+  `;
+    this.#db.exec(query);
   }
-  #getTodo(db, todo_name) {
-    return db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
+  #getTodo(todo_name) {
+    return this.#db.prepare(`SELECT id FROM todos WHERE todo_name = ?`).get(
       todo_name,
     );
   }
-  createTasksTable(db) {
-    if (!db) throw new Error("db is undefined");
+  createTasksTable() {
+    if (!this.#db) throw new Error("db is undefined");
 
-    const todosPresent = db.prepare(
+    const todosPresent = this.#db.prepare(
       "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
     ).get("todos");
 
     if (!todosPresent) {
       throw new Error("todos  is not present");
     }
-    const createTableQuery = `CREATE TABLE IF NOT EXISTS task (
+
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS task (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       todo_id INTEGER NOT NULL,
       task_name TEXT NOT NULL,
@@ -35,24 +43,24 @@ export class SqliteTodoStore {
         ON DELETE CASCADE
     ) STRICT;`;
 
-    db.exec(createTableQuery);
+    this.#db.exec(createTableQuery);
   }
 
-  isToDoAlreadyExist(db, todo_name) {
-    const isExist = db.prepare(
-      "SELECT * FROM todos WHERE todo_name = ?",
+  isToDoAlreadyExist(todo_name) {
+    const isExist = this.#db.prepare(
+      "SELECT * FROM todos WHERE todo_name = ?", // get count
     ).get(todo_name);
     return !!isExist;
   }
 
-  addToDo(db, { todo_name, todo_desc }) {
-    if (db === undefined || todo_name === undefined) {
+  addToDo({ todo_name, todo_desc }) {
+    if (this.#db === undefined || todo_name === undefined) {
       throw new Error("db is undefined");
     }
-    if (this.isToDoAlreadyExist(db, todo_name)) {
+    if (this.isToDoAlreadyExist(todo_name)) {
       throw new Error("TODO is Already Exist");
     }
-    const addData = db.prepare(`
+    const addData = this.#db.prepare(`
       INSERT INTO todos (todo_name, todo_desc)
       VALUES (?, ?)
     `);
@@ -60,74 +68,86 @@ export class SqliteTodoStore {
     addData.run(todo_name, todo_desc);
   }
 
-  listTodo(db) {
-    if (db === undefined) {
+  listTodo() {
+    if (this.#db === undefined) {
       throw new Error("db is undefined");
     }
-    const content = db.prepare(`SELECT * FROM todos`).all();
+    const content = this.#db.prepare(`SELECT * FROM todos`).all();
     return { success: true, content };
   }
 
-  deleteTodo(db, { todo_name }) {
-    if (db === undefined) {
+  deleteTodo({ todo_name }) {
+    if (this.#db === undefined) {
       throw new Error("db is undefined");
     }
-    const deleteQuery = db.prepare(`
+    const deleteQuery = this.#db.prepare(`
       delete from todos where todo_name = ?
       `);
     deleteQuery.run(todo_name);
   }
 
-  addTaskInTodo(db, { todo_name, task_name, task_desc }) {
-    if (db === undefined || todo_name === undefined) {
-      throw new Error(" doesn't exist");
-    }
-    if (!this.isToDoAlreadyExist(db, todo_name)) {
-      throw new Error("todo doesn't exist");
-    }
-    const todo = this.#getTodo(db, todo_name);
+  addTask({ todo_name, task_name, task_desc }) {
+    const todo = this.#getTodo(todo_name);
 
-    const addTaskQuery = db.prepare(`
-  INSERT INTO task (todo_id, task_name, task_desc)
-  VALUES (?, ?, ?)
-`);
+    const addTaskQuery = this.#db.prepare(`
+      INSERT INTO task (todo_id, task_name, task_desc)
+      VALUES (?, ?, ?)`);
 
     addTaskQuery.run(todo.id, task_name, task_desc);
   }
 
-  markTaskDone(db, { todo_name, task_name }) {
-    if (db === undefined || todo_name === undefined) {
+  addTaskInTodo({ todo_name, task_name, task_desc }) {
+    console.log("i was here");
+
+    if (this.#db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
-    if (!this.isToDoAlreadyExist(db, todo_name)) {
+    if (!this.isToDoAlreadyExist(this.#db, todo_name)) {
+      throw new Error("todo doesn't exist");
+    }
+    const todo = this.#getTodo(this.#db, todo_name);
+
+    const addTaskQuery = this.#db.prepare(`
+      INSERT INTO task (todo_id, task_name, task_desc)
+      VALUES (?, ?, ?)`);
+
+    addTaskQuery.run(todo.id, task_name, task_desc);
+  }
+
+  markTaskDone({ todo_name, task_name }) {
+    if (this.#db === undefined || todo_name === undefined) {
+      throw new Error(" doesn't exist");
+    }
+    if (!this.isToDoAlreadyExist(this.#db, todo_name)) {
       throw new Error("todo doesn't exist");
     }
 
-    const todo = this.#getTodo(db, todo_name);
+    const todo = this.#getTodo(this.#db, todo_name);
 
-    const updateTaskQuery = db.prepare(`
-  UPDATE task
-  SET complete = 'done'
-  WHERE task_name = ? AND todo_id = ?
-`);
-    updateTaskQuery.run(task_name, todo.id);
+    const updateTaskQuery = this.#db.prepare(`
+      UPDATE task
+      SET complete = 'done'
+      WHERE task_name = ? AND todo_id = ?
+    `);
+    updateTaskQuery.run(task_name, todo.id); // toggle
   }
 
-  listTasks(db, { todo_name }) {
-    const todo = this.#getTodo(db, todo_name);
+  listTasks({ todo_name }) {
+    const todo = this.#getTodo(todo_name);
 
-    const content = db.prepare(`SELECT * FROM task where todo_id = ?`).all(
-      todo.id,
-    );
+    const content = this.#db.prepare(`SELECT * FROM task where todo_id = ?`)
+      .all(
+        todo.id,
+      );
 
     return { success: true, content };
   }
 
-  deleteTask(db, { todo_name, task_name }) {
-    const todo = this.#getTodo(db, todo_name);
+  deleteTask({ todo_name, task_name }) {
+    const todo = this.#getTodo(todo_name);
 
-    db.prepare(`
-  delete from task where todo_id = ? and task_name = ?
+    this.#db.prepare(`
+  DELETE FROM task WHERE todo_id = ? AND task_name = ?
   `).run(todo.id, task_name);
 
     return { success: true };
