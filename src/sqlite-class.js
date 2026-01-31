@@ -97,15 +97,13 @@ export class SqliteTodoStore {
   }
 
   addTaskInTodo({ todo_name, task_name, task_desc }) {
-    console.log("i was here");
-
     if (this.#db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
-    if (!this.isToDoAlreadyExist(this.#db, todo_name)) {
+    if (!this.isToDoAlreadyExist(todo_name)) {
       throw new Error("todo doesn't exist");
     }
-    const todo = this.#getTodo(this.#db, todo_name);
+    const todo = this.#getTodo(todo_name);
 
     const addTaskQuery = this.#db.prepare(`
       INSERT INTO task (todo_id, task_name, task_desc)
@@ -118,11 +116,11 @@ export class SqliteTodoStore {
     if (this.#db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
-    if (!this.isToDoAlreadyExist(this.#db, todo_name)) {
+    if (!this.isToDoAlreadyExist(todo_name)) {
       throw new Error("todo doesn't exist");
     }
 
-    const todo = this.#getTodo(this.#db, todo_name);
+    const todo = this.#getTodo(todo_name);
 
     const updateTaskQuery = this.#db.prepare(`
       UPDATE task

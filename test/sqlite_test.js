@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { assertEquals, assertThrows } from "@std/assert";
 import { beforeEach, describe, it } from "@std/testing/bdd";
 import { SqliteTodoStore } from "../src/sqlite-class.js";
+import { mock } from "node:test";
 
 describe("CreateTABLE : branch of Creating a table in the ", () => {
   let memory;
@@ -223,7 +224,7 @@ describe("addTaskInToDo : branch of adding task in  tasks table ", () => {
   let mockDb;
   beforeEach(() => {
     mockDb = new DatabaseSync(":memory:");
-    memory = new SqliteTodoStore(mock);
+    memory = new SqliteTodoStore(mockDb);
     memory.createToDoTable();
     memory.createTasksTable();
     const todo = {
@@ -242,7 +243,6 @@ describe("addTaskInToDo : branch of adding task in  tasks table ", () => {
     memory.addTaskInTodo(task);
 
     const taskData = mockDb.prepare(`SELECT * FROM task`).all();
-    console.log();
 
     assertEquals(taskData, [{
       complete: "false",
@@ -286,201 +286,200 @@ describe("addTaskInToDo : branch of adding task in  tasks table ", () => {
       todo_id: 1,
     }]);
   });
-  // it("addTaskInToDo : adding one task  in two different todo  ", () => {
-  //   const todo = {
-  //     todo_name: "Evening",
-  //     todo_desc: "Do something in Evening",
-  //   };
-  //   const task = {
-  //     todo_name: "Morning",
-  //     task_name: "brush",
-  //     task_desc: "do brush for 5 mintues",
-  //   };
-  //   const task2 = {
-  //     todo_name: "Evening",
-  //     task_name: "bath",
-  //     task_desc: "bath with cold water",
-  //   };
-  //   memory.addToDo(todo);
-  //   memory.addTaskInTodo(task);
-  //   memory.addTaskInTodo(task2);
+  it("addTaskInToDo : adding one task  in two different todo  ", () => {
+    const todo = {
+      todo_name: "Evening",
+      todo_desc: "Do something in Evening",
+    };
+    const task = {
+      todo_name: "Morning",
+      task_name: "brush",
+      task_desc: "do brush for 5 mintues",
+    };
+    const task2 = {
+      todo_name: "Evening",
+      task_name: "bath",
+      task_desc: "bath with cold water",
+    };
+    memory.addToDo(todo);
+    memory.addTaskInTodo(task);
+    memory.addTaskInTodo(task2);
 
-  //   const taskData = mockDb.prepare(`SELECT * FROM task`).all();
+    const taskData = mockDb.prepare(`SELECT * FROM task`).all();
 
-  //   assertEquals(taskData, [{
-  //     complete: "false",
-  //     id: 1,
-  //     task_desc: "do brush for 5 mintues",
-  //     task_name: "brush",
-  //     todo_id: 1,
-  //   }, {
-  //     complete: "false",
-  //     id: 2,
-  //     task_desc: "bath with cold water",
-  //     task_name: "bath",
-  //     todo_id: 2,
-  //   }]);
-  // });
+    assertEquals(taskData, [{
+      complete: "false",
+      id: 1,
+      task_desc: "do brush for 5 mintues",
+      task_name: "brush",
+      todo_id: 1,
+    }, {
+      complete: "false",
+      id: 2,
+      task_desc: "bath with cold water",
+      task_name: "bath",
+      todo_id: 2,
+    }]);
+  });
 
-  // it("addTaskInToDo:  should throw error provided todo is not exist in the table ", () => {
-  //   assertThrows(() =>
-  //     memory.addTaskInTodo(undefined, {
-  //       todo_name: "dosen't exist",
-  //       task_name: "nothing",
-  //       task_desc: "nothing",
-  //     })
-  //   );
-  // });
-  // it("addTaskInToDo:  should throw error provided undefined table ", () => {
-  //   assertThrows(() => memory.addTaskInTodo(undefined, {}));
-  // });
-  // it("addTaskInToDo:  should throw error provided undefined todo_name to add task  ", () => {
-  //   assertThrows(() => memory.addTaskInTodo({ todo_name: undefined }));
-  // });
+  it("addTaskInToDo:  should throw error provided todo is not exist in the table ", () => {
+    assertThrows(() =>
+      memory.addTaskInTodo(undefined, {
+        todo_name: "dosen't exist",
+        task_name: "nothing",
+        task_desc: "nothing",
+      })
+    );
+  });
+  it("addTaskInToDo:  should throw error provided undefined table ", () => {
+    assertThrows(() => memory.addTaskInTodo(undefined, {}));
+  });
+  it("addTaskInToDo:  should throw error provided undefined todo_name to add task  ", () => {
+    assertThrows(() => memory.addTaskInTodo({ todo_name: undefined }));
+  });
 });
 
-// describe("listTasks : branch of listing task  ", () => {
-//   let memory;
-//   let mockDb;
-//   beforeEach(() => {
-//     memory = new SqliteTodoStore();
-//     mockDb = new DatabaseSync(":memory:");
-//     memory.createToDoTable(mockDb);
-//     memory.createTasksTable(mockDb);
-//     const todo = {
-//       todo_name: "Morning",
-//       todo_desc: "thingsTO do in morning",
-//     };
-//     memory.addToDo(todo);
-//     const task = {
-//       todo_name: "Morning",
-//       task_name: "brush",
-//       task_desc: "do brush for 5 mintues",
-//     };
+describe("listTasks : branch of listing task  ", () => {
+  let memory;
+  let mockDb;
+  beforeEach(() => {
+    mockDb = new DatabaseSync(":memory:");
+    memory = new SqliteTodoStore(mockDb);
+    memory.createToDoTable(mockDb);
+    memory.createTasksTable(mockDb);
+    const todo = {
+      todo_name: "Morning",
+      todo_desc: "thingsTO do in morning",
+    };
+    memory.addToDo(todo);
+    const task = {
+      todo_name: "Morning",
+      task_name: "brush",
+      task_desc: "do brush for 5 mintues",
+    };
 
-//     memory.addTaskInTodo( task);
-//   });
+    memory.addTaskInTodo(task);
+  });
 
-//   it("listTasks:  listing all task of a todo ", () => {
-//     const listTasks =
-//       memory.listTasks(mockDb, { todo_name: "Morning" }).content;
-//     const taskData = mockDb.prepare(`SELECT * FROM task`).all();
+  it("listTasks:  listing all task of a todo ", () => {
+    const listTasks = memory.listTasks({ todo_name: "Morning" }).content;
+    const taskData = mockDb.prepare(`SELECT * FROM task`).all();
 
-//     assertEquals(listTasks, taskData);
-//   });
-// });
+    assertEquals(listTasks, taskData);
+  });
+});
 
-// describe("markTaskDone : branch of marking task as done in task table  ", () => {
-//   let memory;
-//   let mockDb;
-//   beforeEach(() => {
-//     memory = new SqliteTodoStore();
-//     mockDb = new DatabaseSync(":memory:");
-//     memory.createToDoTable(mockDb);
-//     memory.createTasksTable(mockDb);
-//     const todo = {
-//       todo_name: "Morning",
-//       todo_desc: "thingsTO do in morning",
-//     };
-//     memory.addToDo(todo);
-//     const task = {
-//       todo_name: "Morning",
-//       task_name: "brush",
-//       task_desc: "do brush for 5 mintues",
-//     };
+describe("markTaskDone : branch of marking task as done in task table  ", () => {
+  let memory;
+  let mockDb;
+  beforeEach(() => {
+    mockDb = new DatabaseSync(":memory:");
+    memory = new SqliteTodoStore(mockDb);
+    memory.createToDoTable(mockDb);
+    memory.createTasksTable(mockDb);
+    const todo = {
+      todo_name: "Morning",
+      todo_desc: "thingsTO do in morning",
+    };
+    memory.addToDo(todo);
+    const task = {
+      todo_name: "Morning",
+      task_name: "brush",
+      task_desc: "do brush for 5 mintues",
+    };
 
-//     memory.addTaskInTodo( task);
-//   });
-//   it("markTaskDone:  marking one task done in the task  ", () => {
-//     const task1 = {
-//       todo_name: "Morning",
-//       task_name: "bath",
-//       task_desc: "do brush for 5 mintues",
-//     };
+    memory.addTaskInTodo(task);
+  });
+  it("markTaskDone:  marking one task done in the task  ", () => {
+    const task1 = {
+      todo_name: "Morning",
+      task_name: "bath",
+      task_desc: "do brush for 5 mintues",
+    };
 
-//     memory.addTaskInTodo( task1);
+    memory.addTaskInTodo(task1);
 
-//     memory.markTaskDone(mockDb, { todo_name: "Morning", task_name: "brush" });
-//     memory.markTaskDone(mockDb, { todo_name: "Morning", task_name: "bath" });
+    memory.markTaskDone({ todo_name: "Morning", task_name: "brush" });
+    memory.markTaskDone({ todo_name: "Morning", task_name: "bath" });
 
-//     const taskData = memory.listTasks(mockDb, { todo_name: "Morning" }).content;
+    const taskData = memory.listTasks({ todo_name: "Morning" }).content;
 
-//     assertEquals(taskData, [
-//       {
-//         complete: "done",
-//         id: 1,
-//         task_desc: "do brush for 5 mintues",
-//         task_name: "brush",
-//         todo_id: 1,
-//       },
+    assertEquals(taskData, [
+      {
+        complete: "done",
+        id: 1,
+        task_desc: "do brush for 5 mintues",
+        task_name: "brush",
+        todo_id: 1,
+      },
 
-//       {
-//         complete: "done",
-//         id: 2,
-//         task_desc: "do brush for 5 mintues",
-//         task_name: "bath",
-//         todo_id: 1,
-//       },
-//     ]);
-//   });
-//   it("markTaskDone:  marking multiple of marking task as done in task table ", () => {
-//     memory.markTaskDone(mockDb, { todo_name: "Morning", task_name: "brush" });
+      {
+        complete: "done",
+        id: 2,
+        task_desc: "do brush for 5 mintues",
+        task_name: "bath",
+        todo_id: 1,
+      },
+    ]);
+  });
+  it("markTaskDone:  marking multiple of marking task as done in task table ", () => {
+    memory.markTaskDone({ todo_name: "Morning", task_name: "brush" });
 
-//     const taskData = mockDb.prepare(`SELECT * FROM task`).all();
+    const taskData = mockDb.prepare(`SELECT * FROM task`).all();
 
-//     assertEquals(taskData, [{
-//       complete: "done",
-//       id: 1,
-//       task_desc: "do brush for 5 mintues",
-//       task_name: "brush",
-//       todo_id: 1,
-//     }]);
-//   });
+    assertEquals(taskData, [{
+      complete: "done",
+      id: 1,
+      task_desc: "do brush for 5 mintues",
+      task_name: "brush",
+      todo_id: 1,
+    }]);
+  });
 
-//   it("markTaskDone:  should throw error provided undefined table ", () => {
-//     assertThrows(() => memory.mark(undefined, {}));
-//   });
-// });
-// describe("deleteTask : branch of deleting  task from task table  ", () => {
-//   let memory;
-//   let mockDb;
-//   beforeEach(() => {
-//     memory = new SqliteTodoStore();
-//     mockDb = new DatabaseSync(":memory:");
-//     memory.createToDoTable(mockDb);
-//     memory.createTasksTable(mockDb);
-//     const todo = {
-//       todo_name: "Morning",
-//       todo_desc: "thingsTO do in morning",
-//     };
-//     memory.addToDo(todo);
-//     const task = {
-//       todo_name: "Morning",
-//       task_name: "brush",
-//       task_desc: "do brush for 5 mintues",
-//     };
+  it("markTaskDone:  should throw error provided undefined table ", () => {
+    assertThrows(() => memory.mark(undefined, {}));
+  });
+});
 
-//     memory.addTaskInTodo(mockDb, task);
-//   });
-//   it("deleteTask:  deleting one task  ", () => {
-//     const task1 = {
-//       todo_name: "Morning",
-//       task_name: "bath",
-//       task_desc: "do brush for 5 mintues",
-//     };
+describe("deleteTask : branch of deleting  task from task table  ", () => {
+  let memory;
+  let mockDb;
+  beforeEach(() => {
+    mockDb = new DatabaseSync(":memory:");
+    memory = new SqliteTodoStore(mockDb);
+    memory.createToDoTable(mockDb);
+    memory.createTasksTable(mockDb);
+    const todo = {
+      todo_name: "Morning",
+      todo_desc: "thingsTO do in morning",
+    };
+    memory.addToDo(todo);
+    const task = {
+      todo_name: "Morning",
+      task_name: "brush",
+      task_desc: "do brush for 5 mintues",
+    };
 
-//     memory.addTaskInTodo(mockDb, task1);
-//     memory.deleteTask(mockDb, { todo_name: "Morning", task_name: "bath" });
-//     const taskContent =
-//       memory.listTasks(mockDb, { todo_name: "Morning" }).content;
-//     assertEquals(taskContent, [
-//       {
-//         complete: "false",
-//         id: 1,
-//         task_desc: "do brush for 5 mintues",
-//         task_name: "brush",
-//         todo_id: 1,
-//       },
-//     ]);
-//   });
-// });
+    memory.addTaskInTodo(task);
+  });
+  it("deleteTask:  deleting one task  ", () => {
+    const task1 = {
+      todo_name: "Morning",
+      task_name: "bath",
+      task_desc: "do brush for 5 mintues",
+    };
+
+    memory.addTaskInTodo(task1);
+    memory.deleteTask({ todo_name: "Morning", task_name: "bath" });
+    const taskContent = memory.listTasks({ todo_name: "Morning" }).content;
+    assertEquals(taskContent, [
+      {
+        complete: "false",
+        id: 1,
+        task_desc: "do brush for 5 mintues",
+        task_name: "brush",
+        todo_id: 1,
+      },
+    ]);
+  });
+});
