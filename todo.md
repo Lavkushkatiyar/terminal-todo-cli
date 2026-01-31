@@ -12,3 +12,25 @@
   [✅] 5 . i have to fix the test cases description to increase consistency
   [✅] 5 . i have to fix the all  test cases to accept the db initialization
   ```
+
+```js
+parser .js
+
+addToDo — ensure command is set to "addToDo" and todo_name / todo_desc are parsed from the args (extra fields remain unchanged).
+
+addTaskInToDo — ensure todo_name, task_name, task_desc are parsed in order.
+
+listTodo — command is set and handler doesn't mutate parser fields .
+
+listTasks — todo_name parsed from args.
+
+markTaskDone — todo_name and task_name parsed from args.
+
+deleteTask — todo_name and task_name parsed.
+
+deleteTodo — todo_name parsed.
+
+unknown command — parser should throw calling an undefined handler.
+
+extra args — extra arguments beyond what's used by a handler are ignored (only the expected positions get consumed).
+```
