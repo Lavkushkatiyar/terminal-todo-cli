@@ -16,7 +16,7 @@
 ```js
 parser .js
 
-addToDo — ensure command is set to "addToDo" and todo_name / todo_desc are parsed from the args (extra fields remain unchanged).
+  [✅] addToDo — ensure command is set to "addToDo" and todo_name / todo_desc are parsed from the args (extra fields remain unchanged).
 
 addTaskInToDo — ensure todo_name, task_name, task_desc are parsed in order.
 
