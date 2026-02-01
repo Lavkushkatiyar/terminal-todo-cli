@@ -33,3 +33,7 @@ parser .js
 
   [✅] extra args — extra arguments beyond what's used by a handler are ignored (only the expected positions get consumed).
 ```
+
+[✅] i have to divide the file of cli-input for better readability .
+
+[] i need to fix the memory.js to accept the changes of the database .

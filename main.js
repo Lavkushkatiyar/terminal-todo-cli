@@ -1,7 +1,9 @@
 import { DatabaseSync } from "node:sqlite";
-import { chooseDatabase, runCli } from "./src/cli-input.js";
+
 import { inMemoryTodoStore } from "./src/memory.js";
 import { SqliteTodoStore } from "./src/sqlite-class.js";
+import { chooseDatabase } from "./terminal-ui/prompts.js";
+import { runCli } from "./src/cli-input.js";
 
 export const main = async () => {
   const databaseChoice = await chooseDatabase();

@@ -1,6 +1,3 @@
-import { error } from "node:console";
-import { parse } from "node:path";
-
 const handleTodoAdd = (args, parser) => {
   parser.todo_name = args[0];
   parser.todo_desc = args[1];

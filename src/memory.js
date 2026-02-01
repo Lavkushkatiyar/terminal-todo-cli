@@ -34,7 +34,7 @@ export class inMemoryTodoStore {
     return db.tables.todos;
   }
 
-  listTodos(db) {
+  listTodo(db) {
     if (db === undefined) {
       throw new Error("DB is Undefined");
     }
