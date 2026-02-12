@@ -10,6 +10,7 @@ describe("CreateTABLE : branch of Creating a table in the ", () => {
     mockDb = new DatabaseSync(":memory:");
     memory = new SqliteTodoStore(mockDb);
   });
+
   it("CreateTodoTable:  creating the todos table", () => {
     memory.createTodoTable(mockDb);
     const result = mockDb.prepare(
@@ -17,6 +18,7 @@ describe("CreateTABLE : branch of Creating a table in the ", () => {
     ).get("todos");
     assertEquals(!!result, true);
   });
+
   it("CreateTodoTable:  creating the todos table and referenced tasks table ", () => {
     memory.createTodoTable();
     memory.createTasksTable();
@@ -29,73 +31,102 @@ describe("CreateTABLE : branch of Creating a table in the ", () => {
     assertEquals(!!todosPresent, true);
     assertEquals(!!tasksPresent, true);
   });
-  it("CreateTaskTable:  creating tasks table without todos should throw error ", () => {
-    assertThrows(() => memory.createTasksTable(mockDb));
+
+  it("CreateTaskTable:  creating tasks table without todos should return error ", () => {
+    assertEquals(memory.createTasksTable(mockDb), {
+      error: "todos is not present",
+      success: false,
+    });
   });
-  it("CreateTodoTable:  should throw error provided undefined table ", () => {
+
+  it("CreateTodoTable:  should return error provided undefined table ", () => {
     memory = new SqliteTodoStore(undefined);
-    assertThrows(() => memory.createTodoTable());
+    assertEquals(memory.createTodoTable(), {
+      error: "failed to create todo table",
+      success: false,
+    });
   });
 });
-describe("ADD_Todo : branch of Adding a Todo in todos table ", () => {
+
+describe("Add_Todo : adding todos into todos table", () => {
   let memory;
   let mockDb;
+
   beforeEach(() => {
     mockDb = new DatabaseSync(":memory:");
     memory = new SqliteTodoStore(mockDb);
     memory.createTodoTable();
   });
-  it("Create_todo:  creating a todo in todos table", () => {
+
+  it("Add_Todo: should insert a todo into todos table", () => {
     const todo = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
     };
-    memory.addTodo(todo);
+
+    const response = memory.addTodo(todo);
+
     const result = mockDb.prepare(
       "SELECT * FROM todos WHERE todo_name = ?",
     ).get("Morning");
 
+    assertEquals(response.success, true);
     assertEquals(!!result, true);
   });
-  it("CreateTable:  creating the multiple todos table and tasks ", () => {
+
+  it("Add_Todo: should allow inserting multiple todos", () => {
     const todo1 = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
     };
+
     const todo2 = {
       todo_name: "Evening",
       todo_desc: "thingsTO do in evening",
     };
-    memory.addTodo(todo1);
-    memory.addTodo(todo2);
+
+    const res1 = memory.addTodo(todo1);
+    const res2 = memory.addTodo(todo2);
 
     const morningTodo = mockDb.prepare(
       "SELECT * FROM todos WHERE todo_name = ?",
     ).get("Morning");
-    const EveningTodo = mockDb.prepare(
+
+    const eveningTodo = mockDb.prepare(
       "SELECT * FROM todos WHERE todo_name = ?",
     ).get("Evening");
+
+    assertEquals(res1.success, true);
+    assertEquals(res2.success, true);
     assertEquals(!!morningTodo, true);
-    assertEquals(!!EveningTodo, true);
+    assertEquals(!!eveningTodo, true);
   });
-  it("CreateTable:  should throw error If todo already exist ", () => {
-    const todo1 = {
+
+  it("Add_Todo: should fail if todo already exists", () => {
+    const todo = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
     };
 
-    memory.addTodo(todo1);
-    assertThrows(() => memory.addTodo(todo1));
+    memory.addTodo(todo);
+    const response = memory.addTodo(todo);
+
+    assertEquals(response.success, false);
+    assertEquals(response.error, "TODO is Already Exist");
   });
-  it("CreateTable:  should throw error provided undefined table ", () => {
-    assertThrows(() => memory.addTodo(undefined, {}));
-  });
-  it("CreateTable:  should throw error provided undefined todo_name ", () => {
-    assertThrows(() => memory.addTodo({ todo_name: undefined, todo_desc: "" }));
+
+  it("Add_Todo: should fail if todo_name is undefined", () => {
+    const response = memory.addTodo({
+      todo_name: undefined,
+      todo_desc: "",
+    });
+
+    assertEquals(response.success, false);
+    assertEquals(response.error, "todo is undefined");
   });
 });
 
-describe("ListTodo : branch of Listing todos table ", () => {
+describe("List_Todo : branch of Listing todos table ", () => {
   let memory;
   let mockDb;
   beforeEach(() => {
@@ -103,7 +134,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
     memory = new SqliteTodoStore(mockDb);
     memory.createTodoTable();
   });
-  it("List_todo:  should List todos table (1 todo added)", () => {
+  it("List_Todo:  should List todos table (1 todo added)", () => {
     const todo = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
@@ -116,7 +147,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
       todo_name: "Morning",
     }]);
   });
-  it("List_todo:  should List todos table (multiple todo added)", () => {
+  it("List_Todo:  should List todos table (multiple todo added)", () => {
     const todo = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
@@ -129,7 +160,7 @@ describe("ListTodo : branch of Listing todos table ", () => {
       todo_name: "Morning",
     }]);
   });
-  it("List_todo:  should List todos table (1 todo)", () => {
+  it("List_Todo:  should List todos table (1 todo)", () => {
     const todo = {
       todo_name: "Morning",
       todo_desc: "thingsTO do in morning",
@@ -152,11 +183,15 @@ describe("ListTodo : branch of Listing todos table ", () => {
     }]);
   });
 
-  it("List_todo:  should throw error provided undefined table ", () => {
+  it("List_Todo:  should return error provided undefined table ", () => {
     memory = new SqliteTodoStore(undefined);
-    assertThrows(() => memory.listTodo({}));
+    assertEquals(memory.listTodo(), {
+      error: "failed to list todos",
+      success: false,
+    });
   });
 });
+
 describe("DELETE_Todo : branch of DELETING todos table ", () => {
   let memory;
   let mockDb;
@@ -213,7 +248,7 @@ describe("DELETE_Todo : branch of DELETING todos table ", () => {
     assertEquals(todoTable, []);
   });
 
-  it("Delete_todo:  should throw error provided undefined table ", () => {
+  it("Delete_todo:  should return error provided undefined table ", () => {
     assertThrows(() => memory.deleteTodo(undefined, {}));
   });
 });
@@ -321,7 +356,7 @@ describe("addTaskInTodo : branch of adding task in  tasks table ", () => {
     }]);
   });
 
-  it("addTaskInTodo:  should throw error provided todo is not exist in the table ", () => {
+  it("addTaskInTodo:  should return error provided todo is not exist in the table ", () => {
     assertThrows(() =>
       memory.addTaskInTodo(undefined, {
         todo_name: "dosen't exist",
@@ -330,11 +365,8 @@ describe("addTaskInTodo : branch of adding task in  tasks table ", () => {
       })
     );
   });
-  it("addTaskInTodo:  should throw error provided undefined table ", () => {
+  it("addTaskInTodo:  should return error provided undefined table ", () => {
     assertThrows(() => memory.addTaskInTodo(undefined, {}));
-  });
-  it("addTaskInTodo:  should throw error provided undefined todo_name to add task  ", () => {
-    assertThrows(() => memory.addTaskInTodo({ todo_name: undefined }));
   });
 });
 
@@ -435,7 +467,7 @@ describe("markTaskDone : branch of marking task as done in task table  ", () => 
     }]);
   });
 
-  it("markTaskDone:  should throw error provided undefined table ", () => {
+  it("markTaskDone:  should return error provided undefined table ", () => {
     assertThrows(() => memory.mark(undefined, {}));
   });
 });

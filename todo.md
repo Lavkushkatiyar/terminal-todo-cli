@@ -36,4 +36,6 @@ parser .js
 
 [✅] i have to divide the file of cli-input for better readability .
 
-[] i need to fix the memory.js to accept the changes of the database .
+[done] i need to fix the memory.js to accept the changes of the database .
+
+[] i have to fix the consistency in the sending response of the object

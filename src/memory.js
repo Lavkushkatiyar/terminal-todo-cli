@@ -32,7 +32,7 @@ export class InMemoryTodoStore {
 
   addTodo({ todo_name, todo_desc }) {
     this.#db.tables.todos.push({
-      todo_id: this.#nextId++,
+      id: this.#nextId++,
       todo_name,
       todo_desc,
       tasks: [],

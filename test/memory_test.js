@@ -19,7 +19,7 @@ describe("AddTODO: branch of  memory ", () => {
       {
         tasks: [],
         todo_desc: "things To do in morning",
-        todo_id: 1,
+        id: 1,
         todo_name: "Morning Routine",
       },
     ]);
@@ -41,13 +41,13 @@ describe("AddTODO: branch of  memory ", () => {
       {
         tasks: [],
         todo_desc: "things To do in morning",
-        todo_id: 1,
+        id: 1,
         todo_name: "Morning Routine",
       },
       {
         tasks: [],
         todo_desc: "things To do in evening",
-        todo_id: 2,
+        id: 2,
         todo_name: "Evening Routine",
       },
     ]);
@@ -85,7 +85,7 @@ describe("DeleteTODO: branch of  memory ", () => {
       {
         tasks: [],
         todo_desc: "things To do in evening",
-        todo_id: 2,
+        id: 2,
         todo_name: "Evening Routine",
       },
     ]);
@@ -110,7 +110,7 @@ describe("ListTODO: branch of listing the todo in   memory ", () => {
         {
           tasks: [],
           todo_desc: "things To do in morning",
-          todo_id: 1,
+          id: 1,
           todo_name: "Morning Routine",
         },
       ],
@@ -136,7 +136,7 @@ describe("addTaskInTodo: branch of  memory ", () => {
 
     assertEquals(memory.listTodo().content, [
       {
-        todo_id: 1,
+        id: 1,
         todo_name: "Morning Routine",
         todo_desc: "things To do in morning",
         tasks: [
@@ -170,7 +170,7 @@ describe("addTaskInTodo: branch of  memory ", () => {
 
     assertEquals(memory.listTodo().content, [
       {
-        todo_id: 1,
+        id: 1,
         todo_name: "Morning Routine",
         todo_desc: "things To do in morning",
         tasks: [

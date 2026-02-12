@@ -7,6 +7,7 @@ import { runCli } from "./src/cli_input.js";
 
 export const main = async () => {
   const databaseChoice = await chooseDatabase();
+
   if (databaseChoice === "inMemory") {
     const todoService = new InMemoryTodoStore();
     runCli(todoService, databaseChoice);

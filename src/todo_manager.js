@@ -1,44 +1,73 @@
 import { parser } from "./parser.js";
 
-export const todoManager = (todoService, cliArgs) => {
-  const { command, ...options } = parser(cliArgs);
-  let list;
-  switch (command) {
-    case "listTodo":
-      list = todoService.listTodo(options);
-      break;
-    case "listTasks":
-      list = todoService.listTasks(options);
-      break;
-    case "addTodo":
-      todoService.addTodo(options);
-      break;
-    case "addTaskInTodo":
-      todoService.addTaskInTodo(options);
-      break;
-    case "markTaskDone":
-      todoService.markTaskDone(options);
-      break;
-    case "deleteTask":
-      todoService.deleteTask(options);
-      break;
-    case "deleteTodo":
-      todoService.deleteTodo(options);
-      break;
+const COMMAND_HANDLERS = {
+  listTodo: (service, options) => service.listTodo(options),
+  listTasks: (service, options) => service.listTasks(options),
+  addTodo: (service, options) => service.addTodo(options),
+  addTaskInTodo: (service, options) => service.addTaskInTodo(options),
+  markTaskDone: (service, options) => service.markTaskDone(options),
+  deleteTask: (service, options) => service.deleteTask(options),
+  deleteTodo: (service, options) => service.deleteTodo(options),
+};
 
-    default:
-      throw new Error("command is Invalid");
+const printTodos = (result) => {
+  if (!result.success) {
+    console.error(result.error);
+    return;
   }
-  if (list && command === "listTodo") {
-    const todos = list.content.map((
-      { id, todo_name, todo_desc },
-    ) => ({
+
+  if (!result.content) {
+    console.table([]);
+    return;
+  }
+
+  const rows = result.content.map(({ id, todo_name, todo_desc }) => {
+    return {
       id,
       todo_name,
       todo_desc,
-    }));
-    console.table(todos);
+    };
+  });
+
+  console.table(rows);
+};
+
+const printList = (result) => {
+  if (!result.success) {
+    console.error(result.error);
     return;
   }
-  if (list) console.table(list.content);
+
+  if (!result.content) {
+    console.table([]);
+    return;
+  }
+
+  console.table(result.content);
+};
+
+export const todoManager = (service, cliArgs) => {
+  const { command, ...options } = parser(cliArgs);
+
+  const action = COMMAND_HANDLERS[command];
+
+  if (!action) {
+    throw new Error("Invalid command");
+  }
+
+  const result = action(service, options);
+
+  if (!result.success) {
+    throw new Error(result.error);
+  }
+
+  if (command === "listTodo") {
+    printTodos(result);
+    return;
+  }
+
+  if (command === "listTasks") {
+    printList(result);
+    return;
+  }
 };
