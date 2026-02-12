@@ -5,9 +5,9 @@ import {
   chooseDatabase,
   getTodosChoicesFromHandler,
 } from "../terminal-ui/prompts.js";
-import { collectArgsForOperation } from "../terminal-ui/collect-args.js";
-import { manageTodoMenu } from "../terminal-ui/managerMenu.js";
-import { todoManager } from "./todo-manager.js";
+import { collectArgsForOperation } from "../terminal-ui/collect_args.js";
+import { manageTodoMenu } from "../terminal-ui/manager_menu.js";
+import { todoManager } from "./todo_manager.js";
 
 export const runCli = async (todoHandler, databaseChoice, db) => {
   while (true) {
@@ -15,7 +15,7 @@ export const runCli = async (todoHandler, databaseChoice, db) => {
       const todosList = todoHandler.listTodo().content || [];
       const todosExist = todosList.length > 0;
       const allowedTaskOps = new Set([
-        "addTaskInToDo",
+        "addTaskInTodo",
         "listTasks",
         "markTaskDone",
         "deleteTask",
@@ -51,7 +51,7 @@ export const runCli = async (todoHandler, databaseChoice, db) => {
           { name: "Back to main menu", value: "__BACK__" },
         ];
         const chosen = await select({
-          message: "Select a ToDo to manage (or show all):",
+          message: "Select a Todo to manage (or show all):",
           choices: todoChoiceOptions,
           loop: false,
         });

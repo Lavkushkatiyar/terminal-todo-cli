@@ -1,18 +1,22 @@
 export const dbChoices = [
-  { name: "In-Memory", value: "inMemory", description: "Uses in-memory DB" },
+  {
+    name: "In-Memory",
+    value: "inMemory",
+    description: "Uses in-memory DB",
+  },
   { name: "SQLite 3", value: "sqlite", description: "Use sqlite Database" },
 ];
 
 export const operations = [
   {
     name: "Add Todo",
-    value: "addToDo",
+    value: "addTodo",
     description: "Add a new todo (todo_title, todo_desc)",
   },
   { name: "List Todos", value: "listTodo", description: "List all todos" },
   {
     name: "Add Task In Todo",
-    value: "addTaskInToDo",
+    value: "addTaskInTodo",
     description: "Add task into a todo (todo_name, task_name, task_desc)",
   },
   {
@@ -44,7 +48,7 @@ export const operations = [
 ];
 
 export const manageActions = [
-  { name: "Create Task", value: "addTaskInToDo" },
+  { name: "Create Task", value: "addTaskInTodo" },
   { name: "List Tasks", value: "listTasks" },
   { name: "Mark Task Done", value: "markTaskDone" },
   { name: "Delete Task", value: "deleteTask" },

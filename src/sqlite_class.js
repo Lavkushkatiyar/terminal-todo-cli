@@ -3,7 +3,7 @@ export class SqliteTodoStore {
   constructor(db) {
     this.#db = db;
   }
-  createToDoTable() {
+  createTodoTable() {
     if (!this.#db) {
       throw new Error("db is undefined");
     }
@@ -46,18 +46,18 @@ export class SqliteTodoStore {
     this.#db.exec(createTableQuery);
   }
 
-  isToDoAlreadyExist(todo_name) {
+  isTodoAlreadyExist(todo_name) {
     const isExist = this.#db.prepare(
       "SELECT * FROM todos WHERE todo_name = ?", // get count
     ).get(todo_name);
     return !!isExist;
   }
 
-  addToDo({ todo_name, todo_desc }) {
+  addTodo({ todo_name, todo_desc }) {
     if (this.#db === undefined || todo_name === undefined) {
       throw new Error("db is undefined");
     }
-    if (this.isToDoAlreadyExist(todo_name)) {
+    if (this.isTodoAlreadyExist(todo_name)) {
       throw new Error("TODO is Already Exist");
     }
     const addData = this.#db.prepare(`
@@ -100,7 +100,7 @@ export class SqliteTodoStore {
     if (this.#db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
-    if (!this.isToDoAlreadyExist(todo_name)) {
+    if (!this.isTodoAlreadyExist(todo_name)) {
       throw new Error("todo doesn't exist");
     }
     const todo = this.#getTodo(todo_name);
@@ -116,7 +116,7 @@ export class SqliteTodoStore {
     if (this.#db === undefined || todo_name === undefined) {
       throw new Error(" doesn't exist");
     }
-    if (!this.isToDoAlreadyExist(todo_name)) {
+    if (!this.isTodoAlreadyExist(todo_name)) {
       throw new Error("todo doesn't exist");
     }
 

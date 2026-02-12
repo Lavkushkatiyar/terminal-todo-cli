@@ -10,11 +10,11 @@ export const todoManager = (todoService, cliArgs) => {
     case "listTasks":
       list = todoService.listTasks(options);
       break;
-    case "addToDo":
-      todoService.addToDo(options);
+    case "addTodo":
+      todoService.addTodo(options);
       break;
-    case "addTaskInToDo":
-      todoService.addTask(options);
+    case "addTaskInTodo":
+      todoService.addTaskInTodo(options);
       break;
     case "markTaskDone":
       todoService.markTaskDone(options);

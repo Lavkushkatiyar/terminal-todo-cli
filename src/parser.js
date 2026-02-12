@@ -24,8 +24,8 @@ const handleDeleteTodo = (args, parser) => {
 };
 
 const options = {
-  "addToDo": handleTodoAdd,
-  "addTaskInToDo": handleAddTask,
+  "addTodo": handleTodoAdd,
+  "addTaskInTodo": handleAddTask,
   "listTodo": handleListTodo,
   "listTasks": handleListingTask,
   "markTaskDone": handleMarkingDone,

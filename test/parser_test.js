@@ -2,10 +2,10 @@ import { describe, it } from "@std/testing/bdd";
 import { assertEquals, assertThrows } from "@std/assert";
 import { parser } from "../src/parser.js";
 describe("Parser ", () => {
-  describe("addToDo", () => {
+  describe("addTodo", () => {
     it("should parse todo_name and todo_desc", () => {
-      const result = parser(["addToDo", "Shopping", "Buy milk"]);
-      assertEquals(result.command, "addToDo");
+      const result = parser(["addTodo", "Shopping", "Buy milk"]);
+      assertEquals(result.command, "addTodo");
       assertEquals(result.todo_name, "Shopping");
       assertEquals(result.todo_desc, "Buy milk");
       assertEquals(result.task_name, "");
@@ -13,23 +13,24 @@ describe("Parser ", () => {
     });
 
     it("should ignore extra args", () => {
-      const result = parser(["addToDo", "Work", "Deploy", "EXTRA"]);
+      const result = parser(["addTodo", "Work", "Deploy", "EXTRA"]);
       assertEquals(result.todo_name, "Work");
       assertEquals(result.todo_desc, "Deploy");
       assertEquals(result.task_name, "");
     });
   });
-  describe(" addTaskInToDo", () => {
+
+  describe(" addTaskInTodo", () => {
     it("should parse todo_name, task_name, task_desc", () => {
-      const result = parser(["addTaskInToDo", "Work", "API", "Build routes"]);
-      assertEquals(result.command, "addTaskInToDo");
+      const result = parser(["addTaskInTodo", "Work", "API", "Build routes"]);
+      assertEquals(result.command, "addTaskInTodo");
       assertEquals(result.todo_name, "Work");
       assertEquals(result.task_name, "API");
       assertEquals(result.task_desc, "Build routes");
     });
 
     it("should set undefined for missing args", () => {
-      const result = parser(["addTaskInToDo", "Work"]);
+      const result = parser(["addTaskInTodo", "Work"]);
       assertEquals(result.todo_name, "Work");
       assertEquals(result.task_name, undefined);
       assertEquals(result.task_desc, undefined);

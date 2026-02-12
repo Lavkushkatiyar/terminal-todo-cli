@@ -1,13 +1,17 @@
 import { select } from "npm:@inquirer/prompts";
 import { manageActions } from "./constants.js";
-import { getTasksChoicesFromHandler, promptInput } from "./prompts.js";
-import { todoManager } from "../src/todo-manager.js";
+import {
+  getTasksChoicesFromHandler,
+  promptInput,
+  promptSelect,
+} from "./prompts.js";
+import { todoManager } from "../src/todo_manager.js";
 
 export const handleAddTaskInTodo = async (todoHandler, todo_name) => {
   const taskName = await promptInput("Enter Task name:", true);
   const taskDesc = await promptInput("Enter Task description:", false);
   await todoManager(todoHandler, [
-    "addTaskInToDo",
+    "addTaskInTodo",
     todo_name,
     taskName,
     taskDesc ?? "",
@@ -48,7 +52,7 @@ export const handleDeleteTask = async (todoHandler, todo_name) => {
 export const handleDeleteTodo = async (todoHandler, todo_name) =>
   await todoManager(todoHandler, ["deleteTodo", todo_name]);
 const manageActionHandlers = {
-  addTaskInToDo: handleAddTaskInTodo,
+  addTaskInTodo: handleAddTaskInTodo,
   listTasks: handleListTasks,
   markTaskDone: handleMarkTaskDone,
   deleteTask: handleDeleteTask,
@@ -58,11 +62,10 @@ const manageActionHandlers = {
 export const manageTodoMenu = async (todoHandler, todo_name) => {
   while (true) {
     try {
-      const choice = await promptSelect({
-        message: `Manage ToDo: ${todo_name} — choose action`,
-        choices: manageActions,
-        loop: false,
-      });
+      const choice = await promptSelect(
+        `Manage Todo: ${todo_name} — choose action`,
+        manageActions,
+      );
 
       if (choice === "back") {
         return;
