@@ -11,7 +11,7 @@ export const main = async () => {
     const todoService = new InMemoryTodoStore();
     runCli(todoService, databaseChoice);
   } else {
-    const db = new DatabaseSync("ToDo.db");
+    const db = new DatabaseSync("Todo_db.db");
     const todoService = new SqliteTodoStore(db);
     todoService.createTodoTable();
     todoService.createTasksTable();
